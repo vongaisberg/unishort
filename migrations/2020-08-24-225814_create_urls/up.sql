@@ -1,0 +1,6 @@
+CREATE TABLE urls (
+    id SERIAL PRIMARY KEY,
+    url VARCHAR UNIQUE NOT NULL,
+    short_url VARCHAR UNIQUE NOT NULL,
+    timestamp TIMESTAMP NOT NULL
+  )
