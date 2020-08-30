@@ -31,6 +31,8 @@ use schema::urls::dsl::*;
 use dotenv::dotenv;
 use std::env;
 
+use regex::Regex;
+
 #[derive(FromForm)]
 struct ShortenTask {
     url_long: String,
@@ -46,8 +48,9 @@ fn shorten(
     url_long: Form<ShortenTask>,
     db: db::Connection,
     generator: State<url_codepoint::CodepointGenerator>,
+  //  url_verifier: State<Regex>,
 ) -> Result<content::Html<String>, status::Custom<String>> {
-    let URL = env::var("URL").unwrap();
+    let server_url = env::var("URL").unwrap();
     let url_long = &url_long.url_long;
     println!("{}", url_long);
     return match url::Url::parse(&url_long) {
@@ -55,7 +58,7 @@ fn shorten(
             Status::UnprocessableEntity,
             "The URL you entered was not valid.".to_owned(),
         )),
-        Ok(url_long) => {
+        Ok(_) => {
             let existing_short_url = urls
                 .filter(url.eq(&url_long.to_string()))
                 .first::<Url>(db.connection());
@@ -63,7 +66,7 @@ fn shorten(
                 Ok(existing_short_url) => {
                     return Ok(content::Html(format!(
                         "Your short URL is: <a href=\"{}/{}\">{}/{}</a>",
-                        URL, existing_short_url.short_url, URL, existing_short_url.short_url
+                        server_url, existing_short_url.short_url, server_url, existing_short_url.short_url
                     )))
                 }
                 Err(_) => {
@@ -99,7 +102,7 @@ fn shorten(
                     );
                     return Ok(content::Html(format!(
                         "Your short URL is: <a href=\"{}/{}\">{}/{}</a>",
-                        URL, url_short, URL, url_short
+                        server_url, url_short, server_url, url_short
                     )));
                 }
             }
@@ -123,14 +126,12 @@ fn resolve(
 
 fn main() {
     dotenv().ok();
-    println!(
-        "Display URL is set to {}",
-        env::var("URL").unwrap()
-    );
+    println!("Display URL is set to {}", env::var("URL").unwrap());
 
     rocket::ignite()
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::new())
+        //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
         //.mount("/shorten", routes![shorten])
         .mount("/", routes![resolve, index, shorten])
         .launch();
