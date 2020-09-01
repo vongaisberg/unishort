@@ -1,9 +1,21 @@
 <html>
 <body>
-<form action="/" method="post">
+
+    <h2>Welcome at 🤏.to, the shortest URL shortener in the world!</h2>
+    It uses (most) of the Unicode space to produce 7 character URLs, much shorter then all the other URL-shorteners.
+    <br>
+    <br>
+
+    <form action="/" method="post">
     <label for="url_long">Enter your URL here:</label>
     <input type="text" id="url_long" name="url_long">
     <input type="submit" value="Shorten">
 </form>
+
+<br><br>
+
+As you can tell, this is just a very minimal proof-of-concept. Feel free to contribute at <a href="https://github.com/vongaisberg/unishort">github.com/vongaisberg/unishort</a>
+<br>
+Powered by Rust, Rocket, Diesel and PostgreSQL.
 </body>
 </html>
