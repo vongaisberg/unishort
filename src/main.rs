@@ -65,7 +65,7 @@ fn shorten(
             match existing_short_url {
                 Ok(existing_short_url) => {
                     return Ok(content::Html(format!(
-                        "Your short URL is: <a href=\"{}/{}\">{}/{}</a>",
+                        "Your short URL is: <a href=\"http://{}/{}\">{}/{}</a>",
                         server_url, existing_short_url.short_url, server_url, existing_short_url.short_url
                     )))
                 }
@@ -101,7 +101,7 @@ fn shorten(
                         character2 as u32
                     );
                     return Ok(content::Html(format!(
-                        "Your short URL is: <a href=http://\"{}/{}\">{}/{}</a>",
+                        "Your short URL is: <a href=\"http://{}/{}\">{}/{}</a>",
                         server_url, url_short, server_url, url_short
                     )));
                 }
