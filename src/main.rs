@@ -101,7 +101,7 @@ fn shorten(
                         character2 as u32
                     );
                     return Ok(content::Html(format!(
-                        "Your short URL is: <a href=\"{}/{}\">{}/{}</a>",
+                        "Your short URL is: <a href=http://\"{}/{}\">{}/{}</a>",
                         server_url, url_short, server_url, url_short
                     )));
                 }
