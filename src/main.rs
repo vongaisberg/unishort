@@ -31,7 +31,7 @@ use schema::urls::dsl::*;
 use dotenv::dotenv;
 use std::env;
 
-use regex::Regex;
+
 
 #[derive(FromForm)]
 struct ShortenTask {
@@ -56,7 +56,7 @@ fn shorten(
     return match url::Url::parse(&url_long) {
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
-            "The URL you entered was not valid.".to_owned(),
+            "The URL you entered was not valid. For now, all URLs have to start with \"http://\". This will be changed in a future version".to_owned(),
         )),
         Ok(_) => {
             let existing_short_url = urls
