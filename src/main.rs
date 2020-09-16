@@ -31,8 +31,6 @@ use schema::urls::dsl::*;
 use dotenv::dotenv;
 use std::env;
 
-
-
 #[derive(FromForm)]
 struct ShortenTask {
     url_long: String,
@@ -48,7 +46,7 @@ fn shorten(
     url_long: Form<ShortenTask>,
     db: db::Connection,
     generator: State<url_codepoint::CodepointGenerator>,
-  //  url_verifier: State<Regex>,
+    //  url_verifier: State<Regex>,
 ) -> Result<content::Html<String>, status::Custom<String>> {
     let server_url = env::var("URL").unwrap();
     let url_long = &url_long.url_long;
@@ -64,9 +62,15 @@ fn shorten(
                 .first::<Url>(db.connection());
             match existing_short_url {
                 Ok(existing_short_url) => {
+                    let name1 = unicode_names2::name(existing_short_url.short_url.chars().nth(0).unwrap_or('\0'))
+                            .map(|name| name.to_string())
+                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+                    let name2 = unicode_names2::name(existing_short_url.short_url.chars().nth(1).unwrap_or('\0'))
+                            .map(|name| name.to_string())
+                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
                     return Ok(content::Html(format!(
-                        "Your short URL is: <input type=\"text\" value=\"http://{}/{}\">",
-                        server_url, existing_short_url.short_url
+                        "Your short URL is: <input type=\"text\" value=\"http://{}/{}\"><br><br>Pronunciation: \"Pinching Hand Dot TO Slash {} {}\"",
+                        server_url, existing_short_url.short_url, name1, name2
                     )))
                 }
                 Err(_) => {
@@ -88,22 +92,26 @@ fn shorten(
                             .execute(db.connection())
                     );
 
-                    println!(
-                        "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
-                        url_short,
-                        unicode_names2::name(character1)
+
+                    let name1 = unicode_names2::name(character1)
                             .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()),
-                        character1 as u32,
-                        unicode_names2::name(character2)
+                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+                    let name2 = unicode_names2::name(character2)
                             .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()),
-                        character2 as u32
+                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+
+                     println!(
+                                "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
+                                url_short,
+                                name1,
+                                character1 as u32,
+                                name2,
+                                character2 as u32
                     );
                     return Ok(content::Html(format!(
-                        "Your short URL is: <input type=\"text\" value=\"http://{}/{}\">",
-                        server_url, url_short
-                    )));
+                        "Your short URL is: <input type=\"text\" value=\"http://{}/{}\"><br><br>Pronunciation: \"Pinching Hand Dot TO Slash {} {}\"",
+                        server_url, url_short, name1, name2
+                    )))
                 }
             }
         }
