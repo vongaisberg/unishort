@@ -21,8 +21,8 @@ use rocket::request::Form;
 use rocket::response::Redirect;
 use rocket::State;
 
-use diesel::insert_into;
 use diesel::dsl::count_star;
+use diesel::insert_into;
 use models::Url;
 use rocket::http::Status;
 use rocket::response::content;
@@ -41,8 +41,14 @@ struct ShortenTask {
 fn index(db: db::Connection) -> content::Html<String> {
     content::Html(format!(
         include_str!("../static/index.html"),
-        urls.select(count_star()).first::<i64>(db.connection()).unwrap()
+        urls.select(count_star())
+            .first::<i64>(db.connection())
+            .unwrap()
     ))
+}
+#[get("/styles.css")]
+fn css() -> &'static str {
+    include_str!("../static/styles.css")
 }
 
 #[post("/", data = "<url_long>")]
@@ -147,6 +153,6 @@ fn main() {
         .manage(url_codepoint::CodepointGenerator::new())
         //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
         //.mount("/shorten", routes![shorten])
-        .mount("/", routes![resolve, index, shorten])
+        .mount("/", routes![resolve, index, shorten, css])
         .launch();
 }
