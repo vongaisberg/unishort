@@ -51,7 +51,9 @@ fn shorten(
     let server_url = env::var("URL").unwrap();
     let url_long = &url_long.url_long;
     println!("{}", url_long);
-    return match url::Url::parse(&url_long) {
+  //  return match url::Url::parse(&url_long) {
+      let ok:Result<String, String> = Ok(url_long.to_owned());
+        return match ok{
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
             "The URL you entered was not valid. For now, all URLs have to start with \"http://\". This will be changed in a future version".to_owned(),
