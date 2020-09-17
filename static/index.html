@@ -2,31 +2,48 @@
 
 <head>
     <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 
 <body>
 
-    <h2>Welcome at 🤏.to, the shortest URL shortener in the world!</h2>
-    Pronunciation: <kbd>pinch</kbd><kbd>dot</kbd><kbd>T</kbd><kbd>O</kbd>
-        <br><br>
-        It uses most of the Unicode space to produce 7 character URLs, much shorter then all the other URL-shorteners.
-        <br>
-        <br>
-        <h3>
-            <form action="/" method="post">
-                <label for="url_long">Enter your URL here:</label>
-                <input type="text" id="url_long" name="url_long">
-                <input type="submit" value="Shorten">
-            </form>
-        </h3>
-        <br><br>
-        There are currently <b>{}</b> short URLs.
-        <br><br><br>
+    <h3>Welcome at 🤏.to, the shortest URL shortener in the world!<br>
+        <small>Pronunciation: <kbd>pinch</kbd><kbd>dot</kbd><kbd>T</kbd><kbd>O</kbd></small></h3>
+    <br>
+    <p style="font-size:1em">
+        It uses an emoji domain and two Unicode characters to create ultra-short 7-character URLs.
+        <br>For comparison: bit.ly creates 14-character URLs.
+    </p>
+    <br>
 
-        As you can tell, this is just a very minimal proof-of-concept. Feel free to contribute at <a
-            href="https://github.com/vongaisberg/unishort">github.com/vongaisberg/unishort</a>
-        <br>
+
+    <form action="/" method="post">
+        <label for="url_long">Enter your long URL here:</label>
+
+        <input placeholder="Long URL" type="url" required autofocus id="url_long" name="url_long">
+
+        <button class="btn waves-effect waves-light" type="submit" name="action">Shorten
+            <i class="material-icons right">send</i>
+        </button>
+    </form>
+    <br>
+
+    <p>
+        So far, <b>{}</b> short URLs have been created.
+    </p><br>
+    <p>
+        As you can tell, this is just a very minimal proof-of-concept. Feel free to contribute at <a href="https://github.com/vongaisberg/unishort">github.com/vongaisberg/unishort</a>
+    </p>
+
+    <p>
         Powered by Rust, Rocket, Diesel and PostgreSQL.
+    </p>
 </body>
 
 </html>
