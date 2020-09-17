@@ -75,7 +75,7 @@ fn shorten(
                             .map(|name| name.to_string())
                             .unwrap_or("<invalid>".to_owned()).to_lowercase();
                     return Ok(content::Html(format!(
-                        "Your short URL is: <input type=\"text\" value=\"{}/{}\"><br><br>Pronunciation: \"Pinching Hand Dot TO Slash {} {}\"",
+                        "<h3>Your short URL is: <input type=\"text\" value=\"{}/{}\"></h3><br><br>Pronunciation: \"<i>pinch dot TO slash {} {}</i>\"",
                         server_url, existing_short_url.short_url, name1, name2
                     )))
                 }
@@ -115,7 +115,7 @@ fn shorten(
                                 character2 as u32
                     );
                     return Ok(content::Html(format!(
-                        "Your short URL is: <input type=\"text\" value=\"{}/{}\"><br><br>Pronunciation: \"Pinching Hand Dot TO Slash {} {}\"",
+                        "<h3>Your short URL is: <input type=\"text\" value=\"{}/{}\"></h3><br><br>Pronunciation: \"<i>pinch dot TO slash {} {}</i>\"",
                         server_url, url_short, name1, name2
                     )))
                 }
