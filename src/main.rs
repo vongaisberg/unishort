@@ -49,7 +49,7 @@ struct ShortenTask {
 #[get("/")]
 fn index(db: db::Connection) -> content::RawHtml<String> {
     content::RawHtml(format!(
-        include_str!("../static/index.html"),
+        include_str!("../template/index.html"),
         URL_REGEX,
         urls.select(count_star())
             .first::<i64>(db.connection())
@@ -57,8 +57,10 @@ fn index(db: db::Connection) -> content::RawHtml<String> {
     ))
 }
 #[get("/styles.css")]
-fn css() -> &'static str {
-    include_str!("../static/styles.css")
+fn css() -> Result<content::RawCss<String>, status::Custom<String>> {
+    Ok(content::RawCss(
+        include_str!("../static/styles.css").to_owned(),
+    ))
 }
 
 #[post("/", data = "<url_long>")]
@@ -77,8 +79,8 @@ fn shorten(
     }
     println!("{}", url_long);
     return match url::Url::parse(&url_long) {
-    //let ok: Result<String, String> = Ok(url_long.to_owned());
-    //return match ok{
+        //let ok: Result<String, String> = Ok(url_long.to_owned());
+        //return match ok{
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
             "The URL you entered was not valid.".to_owned(),
@@ -89,16 +91,22 @@ fn shorten(
                 .first::<Url>(db.connection());
             match existing_short_url {
                 Ok(existing_short_url) => {
-                    let name1 = unicode_names2::name(existing_short_url.short_url.chars().nth(0).unwrap_or('\0'))
-                            .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
-                    let name2 = unicode_names2::name(existing_short_url.short_url.chars().nth(1).unwrap_or('\0'))
-                            .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+                    let name1 = unicode_names2::name(
+                        existing_short_url.short_url.chars().nth(0).unwrap_or('\0'),
+                    )
+                    .map(|name| name.to_string())
+                    .unwrap_or("<invalid>".to_owned())
+                    .to_lowercase();
+                    let name2 = unicode_names2::name(
+                        existing_short_url.short_url.chars().nth(1).unwrap_or('\0'),
+                    )
+                    .map(|name| name.to_string())
+                    .unwrap_or("<invalid>".to_owned())
+                    .to_lowercase();
                     return Ok(content::RawHtml(format!(
-                        include_str!("../static/result.html"),
+                        include_str!("../template/result.html"),
                         server_url, existing_short_url.short_url, name1, name2
-                    )))
+                    )));
                 }
                 Err(_) => {
                     //No short url exists for this url, generate a new one.
@@ -119,26 +127,23 @@ fn shorten(
                             .execute(db.connection())
                     );
 
-
                     let name1 = unicode_names2::name(character1)
-                            .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+                        .map(|name| name.to_string())
+                        .unwrap_or("<invalid>".to_owned())
+                        .to_lowercase();
                     let name2 = unicode_names2::name(character2)
-                            .map(|name| name.to_string())
-                            .unwrap_or("<invalid>".to_owned()).to_lowercase();
+                        .map(|name| name.to_string())
+                        .unwrap_or("<invalid>".to_owned())
+                        .to_lowercase();
 
-                     println!(
-                                "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
-                                url_short,
-                                name1,
-                                character1 as u32,
-                                name2,
-                                character2 as u32
+                    println!(
+                        "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
+                        url_short, name1, character1 as u32, name2, character2 as u32
                     );
                     return Ok(content::RawHtml(format!(
-                        include_str!("../static/result.html"),
+                        include_str!("../template/result.html"),
                         server_url, url_short, name1, name2
-                    )))
+                    )));
                 }
             }
         }
