@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro, async_fn_in_trait)]
 
 #[macro_use]
 extern crate rocket;
@@ -8,6 +8,8 @@ extern crate diesel;
 extern crate dotenv;
 extern crate unicode_names2;
 extern crate url;
+#[macro_use]
+extern crate lazy_static;
 
 pub mod codepoint_list;
 pub mod db;
@@ -17,7 +19,7 @@ pub mod unicode_table;
 pub mod url_codepoint;
 
 use diesel::prelude::*;
-use rocket::request::Form;
+use rocket::form::Form;
 use rocket::response::Redirect;
 use rocket::State;
 
@@ -30,7 +32,14 @@ use rocket::response::status;
 use schema::urls::dsl::*;
 
 use dotenv::dotenv;
+use regex::Regex;
 use std::env;
+
+static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
+
+lazy_static! {
+    static ref HTTP_REGEX: Regex = Regex::new(r"^[Hh][Tt][Tt][Pp][Ss]?:\\/\\/").unwrap();
+}
 
 #[derive(FromForm)]
 struct ShortenTask {
@@ -38,9 +47,10 @@ struct ShortenTask {
 }
 
 #[get("/")]
-fn index(db: db::Connection) -> content::Html<String> {
-    content::Html(format!(
+fn index(db: db::Connection) -> content::RawHtml<String> {
+    content::RawHtml(format!(
         include_str!("../static/index.html"),
+        URL_REGEX,
         urls.select(count_star())
             .first::<i64>(db.connection())
             .unwrap()
@@ -55,18 +65,23 @@ fn css() -> &'static str {
 fn shorten(
     url_long: Form<ShortenTask>,
     db: db::Connection,
-    generator: State<url_codepoint::CodepointGenerator>,
+    generator: &State<url_codepoint::CodepointGenerator>,
     //  url_verifier: State<Regex>,
-) -> Result<content::Html<String>, status::Custom<String>> {
+) -> Result<content::RawHtml<String>, status::Custom<String>> {
     let server_url = env::var("URL").unwrap();
-    let url_long = &url_long.url_long;
+    let mut url_long = url_long.url_long.clone();
+    println!("{}", url_long);
+    if !HTTP_REGEX.is_match(&url_long) {
+        println!("No http");
+        url_long = "https://".to_owned() + &url_long;
+    }
     println!("{}", url_long);
     return match url::Url::parse(&url_long) {
     //let ok: Result<String, String> = Ok(url_long.to_owned());
     //return match ok{
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
-            "The URL you entered was not valid. For now, all URLs have to start with \"http://\". This will be changed in a future version".to_owned(),
+            "The URL you entered was not valid.".to_owned(),
         )),
         Ok(_) => {
             let existing_short_url = urls
@@ -80,7 +95,7 @@ fn shorten(
                     let name2 = unicode_names2::name(existing_short_url.short_url.chars().nth(1).unwrap_or('\0'))
                             .map(|name| name.to_string())
                             .unwrap_or("<invalid>".to_owned()).to_lowercase();
-                    return Ok(content::Html(format!(
+                    return Ok(content::RawHtml(format!(
                         include_str!("../static/result.html"),
                         server_url, existing_short_url.short_url, name1, name2
                     )))
@@ -120,7 +135,7 @@ fn shorten(
                                 name2,
                                 character2 as u32
                     );
-                    return Ok(content::Html(format!(
+                    return Ok(content::RawHtml(format!(
                         include_str!("../static/result.html"),
                         server_url, url_short, name1, name2
                     )))
@@ -136,7 +151,7 @@ fn shorten(
 fn resolve(
     url_short: String,
     db: db::Connection,
-    _generator: State<url_codepoint::CodepointGenerator>,
+    _generator: &State<url_codepoint::CodepointGenerator>,
 ) -> Option<Redirect> {
     urls.filter(short_url.eq(&url_short))
         .first::<Url>(db.connection())
@@ -144,15 +159,15 @@ fn resolve(
         .map(|result| Redirect::to(result.url))
 }
 
-fn main() {
+#[launch]
+fn rocket() -> _ {
     dotenv().ok();
     println!("Display URL is set to {}", env::var("URL").unwrap());
 
-    rocket::ignite()
+    rocket::build()
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::new())
         //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
         //.mount("/shorten", routes![shorten])
         .mount("/", routes![resolve, index, shorten, css])
-        .launch();
 }

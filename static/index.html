@@ -2,14 +2,10 @@
 
 <head>
     <link rel="stylesheet" href="styles.css">
-
-    <!-- CSS Reset -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
-
-    <!-- Milligram CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 </head>
 
 <body style="padding:2%">
@@ -25,7 +21,7 @@
     <br>
     <form action="/" method="post">
         <label for="url_long">Enter your long URL here:</label>
-        <input placeholder="Long URL" type="url" required autofocus id="url_long" name="url_long">
+        <input placeholder="Long URL" pattern="{}" required autofocus id="url_long" name="url_long">
         <button type="submit">Shorten</button>
     </form>
     <br>
@@ -34,10 +30,11 @@
     </p>
     <br>
     <p>
-        As you can tell, this is just a very minimal proof-of-concept. Feel free to contribute at <a href="https://github.com/vongaisberg/unishort">github.com/vongaisberg/unishort</a>
+        As you can tell, this is just a very minimal proof-of-concept. Feel free to contribute at <a
+            href="https://github.com/vongaisberg/unishort">github.com/vongaisberg/unishort</a>
     </p>
     <p>
-        Powered by Rust, Rocket, Diesel and PostgreSQL.
+        <small>Powered by Rust, Rocket, Diesel and PostgreSQL.</small>
     </p>
 
 </body>
