@@ -35,8 +35,10 @@ use dotenv::dotenv;
 use regex::Regex;
 use std::env;
 
-static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
+// static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
+// static URL_REGEX: &str = "^((https?):\\/\\/)?([\\w_-\\u00a1-\\uffff]+(?:(?:\\.[\\w_-\\u00a1-\\uffff]+)+))([\\u00a1-\\uffff\\w.,@?^=%&:\\/~+#-]*[\\u00a1-\\uffff\\w@?^=%&\\/~+#-])$";
 
+static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9-]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
 lazy_static! {
     static ref HTTP_REGEX: Regex = Regex::new(r"^[Hh][Tt][Tt][Pp][Ss]?:\\/\\/").unwrap();
 }
