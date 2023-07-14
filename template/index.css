@@ -1,0 +1,147 @@
+html {
+    font-size: 62.5%;
+    line-height: 1.6;
+    font-weight: 300;
+}
+
+
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1.2;
+    font-weight: 300;
+}
+
+h1 {
+    line-height: 1.2;
+    font-weight: 300;
+    font-size: 3.5em;
+    text-align: center;
+    margin-top: 10%;
+    margin-bottom: 1%;
+
+}
+
+.gradient-text {
+    background-color: #f3ec78;
+    background-image: linear-gradient(110deg, rgba(20, 78, 227, 1) 0%, rgba(235, 86, 142, 1) 18%, rgba(163, 83, 170, 1) 71%, rgba(20, 78, 227, 1) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+
+.gradient-text2 {
+    background-color: #f3ec78;
+    background-image: linear-gradient(70deg, rgba(235, 86, 142, 1) 0%, rgba(20, 78, 227, 1) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+
+.non-transparent {
+    -webkit-text-fill-color: #C9CED6;
+    -moz-text-fill-color: #C9CED6;
+}
+
+h3 {
+    font-size: 2.8rem;
+    margin: 0%;
+}
+
+h5 {
+    font-size: 1.8rem;
+    text-align: center;
+    position: relative;
+    width: 80%;
+    margin: auto;
+}
+
+body {
+    font-size: 1.6em;
+    font-weight: 300;
+    margin: 0%;
+    background-color: #0B101B;
+    color: #C9CED6;
+    padding: 2%;
+    font-family: 'Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+}
+
+form {
+    margin-block-end: 0;
+}
+
+#url_long {
+    width: 70%;
+    height: 28px;
+    border-style: none;
+    background-color: transparent;
+    color: #ffffff;
+}
+
+#submit {
+    width: 28%;
+    float: right;
+    height: 60px;
+    margin-top: -16px;
+    border-style: none;
+    border-radius: 30px;
+    margin-right: -15px;
+    background-color: #144EE3;
+    color: #ffffff
+}
+
+#box {
+    padding: 21px;
+    margin: auto;
+    width: 70%;
+    margin-top: 15%;
+    border-color: #353C4A;
+    border-radius: 48px;
+    border-style: solid;
+    background-color: #181E29;
+}
+
+.bottom {
+    position: absolute;
+    bottom: 0;
+}
+
+.patterdn {
+
+    background-color: #e5e5f7;
+    opacity: 0.8;
+    background-image:  linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777);
+    background-size: 46px 81px;
+    background-position: 0 0, 0 0, 23px 40px, 23px 40px, 0 0, 23px 40px;
+
+}
+
+
+.pattern {
+    z-index: -2;
+    position: absolute;
+}
+
+circle {
+    position: absolute;
+    fill: transparent;
+    stroke: white;
+    opacity: 0.05;
+    stroke-width: 2;
+    stroke-dasharray: 250;
+    stroke-dashoffset: 180;
+    animation: rotate 30s linear infinite alternate;
+
+  }
+  
+  @keyframes rotate {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }

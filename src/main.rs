@@ -51,17 +51,17 @@ struct ShortenTask {
 #[get("/")]
 fn index(db: db::Connection) -> content::RawHtml<String> {
     content::RawHtml(format!(
-        include_str!("../template/index.html"),
+        include_str!("../template/index_new.html"),
         URL_REGEX,
         urls.select(count_star())
             .first::<i64>(db.connection())
             .unwrap()
     ))
 }
-#[get("/styles.css")]
+#[get("/index.css")]
 fn css() -> Result<content::RawCss<String>, status::Custom<String>> {
     Ok(content::RawCss(
-        include_str!("../static/styles.css").to_owned(),
+        include_str!("../template/index.css").to_owned(),
     ))
 }
 
