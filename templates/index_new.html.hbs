@@ -1,0 +1,66 @@
+{{#*inline "page"}}
+<div style="max-width: 800px; margin: auto; margin-top: 10%;">
+    <h1 style="font-size: 3.5em; "><span class="gradient-text">Make your links this <span
+                class="non-transparent">🤏</span> short</span></h1><br>
+    <h5>pinch.to produces the shortest URLs in the world by using the full spectrum of unicode characters.</h5>
+    <div id="box">
+        <form action="/" method="post">
+            <!-- <label for="url_long">Enter your long URL here:</label> -->
+            <input placeholder="Paste your long URL here" pattern="{{regex}}" required autofocus id="url_long"
+                name="url_long">
+            <button id="submit" type="submit">Shorten Now!</button>
+        </form>
+    </div>
+
+
+</div>
+
+<div style="overflow-x:auto;">
+    <div class="results">
+        <table>
+            <tr class="header">
+                <th>Short Link</th>
+                <th>Original Link</th>
+                <th>QR-Code</th>
+                <th>Clicks</th>
+                <th>Date</th>
+            </tr>
+            {{#each links}}
+            <tr>
+                <td><input class="short_url" type="text" value="https://🤏.to/{{short_url}}" readonly
+                        onClick="this.select();">
+                </td>
+                <td>
+                    <span class="no_linebreak">
+                        <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}' />
+                        {{{url}}}
+                    </span>
+                </td>
+                <td><img class="qr" src="https://pinch.to/qr/?data={{url}}">
+                </td>
+                <td>{{clicks}}</td>
+                <td><span class="timestamp">{{timestamp}}</span></td>
+            </tr>
+            {{/each}}
+            {{!-- <tr>
+                <td><input class="short_url" type="text" value="https://🤏.to/ｿṤ" readonly onClick="this.select();">
+                </td>
+                <td>
+                    <span class="no_linebreak">
+                        <img class="favicon" src='https://pinch.to/favicon?domain=www.google.com' />
+                        https://google.com
+                    </span>
+                </td>
+                <td><img class="qr" src="https://pinch.to/qr/?data=https%3A%2F%2Fpinch.to%2Fbb">
+                </td>
+                <td>34</td>
+                <td>15.07.2023</td>
+            </tr> --}}
+        </table>
+    </div>
+</div>
+{{!-- <p class="bottom">
+    So far, <b>{{url_counter}}</b> short URLs have been created.
+</p> --}}
+{{/inline}}
+{{> layout title="pinch.to - Shortest URL shortener in the world"}}

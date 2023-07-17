@@ -6,10 +6,19 @@
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <script>
+        function time() {
+            var elems = document.getElementsByClassName("timestamp")
+            for (var i = 0; i < elems.length; i++) {
+                elems[i].innerText = new Date(elems[i].innerText).toLocaleString();
+            }
 
+        }
+    </script>
 </head>
 
-<body>
+<body onload="time()">
     <svg height="100%" width="100%" class="pattern">
         <circle cx="50%" cy="40%" r="50" />
         <circle cx="50%" cy="40%" r="100" />
@@ -19,7 +28,7 @@
         <circle cx="50%" cy="40%" r="300" />
         <circle cx="50%" cy="40%" r="350" />
         <circle cx="50%" cy="40%" r="400" />
-        <circle cx="50%" cy="40%" r="450" />
+        <circle cx="50%" cy="40%" r="450" />K
         <circle cx="50%" cy="40%" r="500" />
         <circle cx="50%" cy="40%" r="550" />
         <circle cx="50%" cy="40%" r="600" />
@@ -31,24 +40,7 @@
     </svg>
 
     <h3><span class="gradient-text2">pinch.to</span></h3>
-    <div style="max-width: 800px; margin: auto; margin-top: 10%;">
-        <h1 style="font-size: 3.5em; "><span class="gradient-text">Make your URLs this <span
-                    class="non-transparent">🤏</span> short</span></h1><br>
-        <h5>pinch.to produces the shortest URLs in the world by using the full spectrum of unicode characters.</h5>
-        <div id="box">
-            <form action="/" method="post">
-                <!-- <label for="url_long">Enter your long URL here:</label> -->
-                <input placeholder="Paste your long URL here" pattern="{}" required autofocus id="url_long"
-                    name="url_long">
-                <button id="submit" type="submit">Shorten Now!</button>
-            </form>
-        </div>
-
-
-    </div>
-    <p class="bottom">
-        So far, <b>{}</b> short URLs have been created.
-    </p>
+    {{~> page}}
 </body>
 
 </html>

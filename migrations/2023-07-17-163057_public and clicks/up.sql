@@ -1,0 +1,4 @@
+ALTER TABLE urls
+ADD COLUMN public boolean NOT NULL DEFAULT true;
+ALTER TABLE urls
+ADD COLUMN clicks bigint NOT NULL DEFAULT 0;

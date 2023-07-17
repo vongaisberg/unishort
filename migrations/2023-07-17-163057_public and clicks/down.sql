@@ -1,0 +1,5 @@
+
+ALTER TABLE urls
+DROP COLUMN public;
+ALTER TABLE urls
+DROP COLUMN clicks;

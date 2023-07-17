@@ -29,6 +29,8 @@ use models::Url;
 use rocket::http::Status;
 use rocket::response::content;
 use rocket::response::status;
+use rocket_dyn_templates::context;
+use rocket_dyn_templates::Template;
 use schema::urls::dsl::*;
 
 use dotenv::dotenv;
@@ -49,19 +51,34 @@ struct ShortenTask {
 }
 
 #[get("/")]
-fn index(db: db::Connection) -> content::RawHtml<String> {
-    content::RawHtml(format!(
-        include_str!("../template/index_new.html"),
-        URL_REGEX,
-        urls.select(count_star())
-            .first::<i64>(db.connection())
-            .unwrap()
-    ))
+fn index(db: db::Connection) -> Template {
+    // content::RawHtml(format!(
+    //     "{}{}",
+    //     URL_REGEX,
+    //     urls.select(count_star())
+    //         .first::<i64>(db.connection())
+    //         .unwrap()
+    // ));
+
+    let links = urls
+        .order_by(timestamp.desc())
+        .limit(10)
+        .load::<Url>(db.connection())
+        .unwrap();
+    let count = urls
+        .select(count_star())
+        .first::<i64>(db.connection())
+        .unwrap();
+
+    Template::render(
+        "index_new",
+        context! {regex: URL_REGEX, url_counter: count, links: links},
+    )
 }
 #[get("/index.css")]
 fn css() -> Result<content::RawCss<String>, status::Custom<String>> {
     Ok(content::RawCss(
-        include_str!("../template/index.css").to_owned(),
+        include_str!("../templates/index.css").to_owned(),
     ))
 }
 
@@ -71,7 +88,7 @@ fn shorten(
     db: db::Connection,
     generator: &State<url_codepoint::CodepointGenerator>,
     //  url_verifier: State<Regex>,
-) -> Result<content::RawHtml<String>, status::Custom<String>> {
+) -> Result<Template, status::Custom<String>> {
     let server_url = env::var("URL").unwrap();
     let mut url_long = url_long.url_long.clone();
     println!("{}", url_long);
@@ -105,10 +122,11 @@ fn shorten(
                     .map(|name| name.to_string())
                     .unwrap_or("<invalid>".to_owned())
                     .to_lowercase();
-                    return Ok(content::RawHtml(format!(
-                        include_str!("../template/result.html"),
-                        server_url, existing_short_url.short_url, name1, name2
-                    )));
+                    // return Ok(content::RawHtml(format!(
+                    //     include_str!("../templates/result.html"),
+                    //     server_url, existing_short_url.short_url, name1, name2
+                    // )));
+                    Ok(index(db))
                 }
                 Err(_) => {
                     //No short url exists for this url, generate a new one.
@@ -142,10 +160,11 @@ fn shorten(
                         "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
                         url_short, name1, character1 as u32, name2, character2 as u32
                     );
-                    return Ok(content::RawHtml(format!(
-                        include_str!("../template/result.html"),
-                        server_url, url_short, name1, name2
-                    )));
+                    // return Ok(content::RawHtml(format!(
+                    //     include_str!("../templates/result.html"),
+                    //     server_url, url_short, name1, name2
+                    // )));
+                    Ok(index(db))
                 }
             }
         }
@@ -174,6 +193,7 @@ fn rocket() -> _ {
     rocket::build()
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::new())
+        .attach(Template::fairing())
         //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
         //.mount("/shorten", routes![shorten])
         .mount("/", routes![resolve, index, shorten, css])
