@@ -28,9 +28,7 @@ use diesel::dsl::count_star;
 use diesel::insert_into;
 use models::Url;
 use rocket::http::Status;
-use rocket::response::content;
 use rocket::response::status;
-use rocket_contrib::serve::StaticFiles;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 use schema::urls::dsl::*;
@@ -44,7 +42,7 @@ use std::env;
 
 static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9-]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
 lazy_static! {
-    static ref HTTP_REGEX: Regex = Regex::new(r"^[Hh][Tt][Tt][Pp][Ss]?:\\/\\/").unwrap();
+    static ref HTTP_REGEX: Regex = Regex::new(r"^https?:\/\/").unwrap();
 }
 
 #[derive(FromForm)]
