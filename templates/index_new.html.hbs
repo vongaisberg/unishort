@@ -19,27 +19,27 @@
     <div class="results">
         <table>
             <tr class="header">
-                <th>Short Link</th>
-                <th>Original Link</th>
-                <th>QR-Code</th>
-                <th>Clicks</th>
-                <th>Date</th>
+                <th class="short_url">Short Link</th>
+                <th class="long_url">Original Link</th>
+                <th class="qr">QR</th>
+                <th class="clicks">Clicks</th>
+                <th class="date">Date</th>
             </tr>
             {{#each links}}
             <tr>
-                <td><input class="short_url" type="text" value="https://🤏.to/{{short_url}}" readonly
+                <td class="short_url"><input class="short_url" type="text" value="{{../server_url}}/{{short_url}}" readonly
                         onClick="this.select();">
                 </td>
-                <td>
+                <td class="long_url">
                     <span class="no_linebreak">
                         <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}' />
-                        {{{url}}}
+                        <a href="{{../server_url}}/{{short_url}}" rel="nofollow">{{{url}}}</a>
                     </span>
                 </td>
-                <td><img class="qr" src="https://pinch.to/qr/?data=https://🤏.to/{{short_url}}">
+                <td class="qr"><img class="qr" src="https://pinch.to/qr/?data={{server_url}}/{{short_url}}">
                 </td>
                 <td>{{clicks}}</td>
-                <td><span class="timestamp">{{timestamp}}</span></td>
+                <td class="date"><span class="timestamp">{{timestamp}}</span></td>
             </tr>
             {{/each}}
             {{!-- <tr>

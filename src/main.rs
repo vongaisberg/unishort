@@ -20,6 +20,7 @@ pub mod url_codepoint;
 
 use diesel::prelude::*;
 use rocket::form::Form;
+use rocket::fs::NamedFile;
 use rocket::response::Redirect;
 use rocket::State;
 
@@ -29,6 +30,7 @@ use models::Url;
 use rocket::http::Status;
 use rocket::response::content;
 use rocket::response::status;
+use rocket_contrib::serve::StaticFiles;
 use rocket_dyn_templates::context;
 use rocket_dyn_templates::Template;
 use schema::urls::dsl::*;
@@ -69,17 +71,19 @@ fn index(db: db::Connection) -> Template {
         .select(count_star())
         .first::<i64>(db.connection())
         .unwrap();
-
+    println!("{}", env::var("URL").unwrap());
     Template::render(
         "index_new",
-        context! {regex: URL_REGEX, url_counter: count, links: links},
+        context! {regex: URL_REGEX, url_counter: count, links: links, server_url: env::var("URL").unwrap()},
     )
 }
-#[get("/index.css")]
-fn css() -> Result<content::RawCss<String>, status::Custom<String>> {
-    Ok(content::RawCss(
-        include_str!("../templates/index.css").to_owned(),
-    ))
+#[get("/styles.css")]
+async fn css() -> Result<NamedFile, std::io::Error> {
+    // Ok(content::RawCss(
+    //     include_str!("../templates/index.css").to_owned(),
+    // ))
+
+    NamedFile::open("static/styles2.css").await
 }
 
 #[post("/", data = "<url_long>")]
@@ -89,7 +93,6 @@ fn shorten(
     generator: &State<url_codepoint::CodepointGenerator>,
     //  url_verifier: State<Regex>,
 ) -> Result<Template, status::Custom<String>> {
-    let server_url = env::var("URL").unwrap();
     let mut url_long = url_long.url_long.clone();
     println!("{}", url_long);
     if !HTTP_REGEX.is_match(&url_long) {
@@ -179,6 +182,10 @@ fn resolve(
     db: db::Connection,
     _generator: &State<url_codepoint::CodepointGenerator>,
 ) -> Option<Redirect> {
+    let _ = diesel::update(urls)
+        .filter(short_url.eq(&url_short))
+        .set(clicks.eq(clicks + 1))
+        .execute(db.connection());
     urls.filter(short_url.eq(&url_short))
         .first::<Url>(db.connection())
         .ok()
@@ -194,6 +201,7 @@ fn rocket() -> _ {
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::new())
         .attach(Template::fairing())
+        // .mount("/static", StaticFiles::from("/static"))
         //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
         //.mount("/shorten", routes![shorten])
         .mount("/", routes![resolve, index, shorten, css])
