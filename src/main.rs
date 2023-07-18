@@ -86,28 +86,20 @@ fn shorten(
             "The URL you entered was not valid.".to_owned(),
         )),
         Ok(_) => {
-            let existing_short_url = urls
-                .filter(url.eq(&url_long.to_string()))
-                .first::<Url>(db.connection());
-            match existing_short_url {
-                Ok(_existing_short_url) => Ok(index(db)),
-                Err(_) => {
-                    //No short url exists for this url, generate a new one.
-                    let chars = [generator.random_codepoint(), generator.random_codepoint()];
-                    let url_short: String = chars[0].to_string() + &chars[1].to_string();
+            //No short url exists for this url, generate a new one.
+            let chars = [generator.random_codepoint(), generator.random_codepoint()];
+            let url_short: String = chars[0].to_string() + &chars[1].to_string();
 
-                    insert_into(urls)
-                        .values((
-                            url.eq(&url_long.to_string()),
-                            short_url.eq(url_short.clone()),
-                            timestamp.eq(chrono::offset::Utc::now().naive_utc()),
-                        ))
-                        .execute(db.connection())
-                        .expect("Could not insert into DB");
+            insert_into(urls)
+                .values((
+                    url.eq(&url_long.to_string()),
+                    short_url.eq(url_short.clone()),
+                    timestamp.eq(chrono::offset::Utc::now().naive_utc()),
+                ))
+                .execute(db.connection())
+                .expect("Could not insert into DB");
 
-                    Ok(index(db))
-                }
-            }
+            Ok(index(db))
         }
     };
 }
