@@ -37,9 +37,6 @@ use dotenv::dotenv;
 use regex::Regex;
 use std::env;
 
-// static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
-// static URL_REGEX: &str = "^((https?):\\/\\/)?([\\w_-\\u00a1-\\uffff]+(?:(?:\\.[\\w_-\\u00a1-\\uffff]+)+))([\\u00a1-\\uffff\\w.,@?^=%&:\\/~+#-]*[\\u00a1-\\uffff\\w@?^=%&\\/~+#-])$";
-
 static URL_REGEX: &str = "^([Hh][Tt][Tt][Pp][Ss]?:\\/\\/)?(?:(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9-]+)(?:\\.(?:[a-zA-Z\\u00a1-\\uffff0-9]+-?)*[a-zA-Z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-zA-Z\\u00a1-\\uffff]{2,}))(?::\\d{2,5})?(?:\\/[^\\s]*)?$";
 lazy_static! {
     static ref HTTP_REGEX: Regex = Regex::new(r"^https?:\/\/").unwrap();
@@ -52,14 +49,6 @@ struct ShortenTask {
 
 #[get("/")]
 fn index(db: db::Connection) -> Template {
-    // content::RawHtml(format!(
-    //     "{}{}",
-    //     URL_REGEX,
-    //     urls.select(count_star())
-    //         .first::<i64>(db.connection())
-    //         .unwrap()
-    // ));
-
     let links = urls
         .order_by(timestamp.desc())
         .limit(10)
@@ -77,10 +66,6 @@ fn index(db: db::Connection) -> Template {
 }
 #[get("/styles.css")]
 async fn css() -> Result<NamedFile, std::io::Error> {
-    // Ok(content::RawCss(
-    //     include_str!("../templates/index.css").to_owned(),
-    // ))
-
     NamedFile::open("static/styles2.css").await
 }
 
@@ -89,18 +74,13 @@ fn shorten(
     url_long: Form<ShortenTask>,
     db: db::Connection,
     generator: &State<url_codepoint::CodepointGenerator>,
-    //  url_verifier: State<Regex>,
 ) -> Result<Template, status::Custom<String>> {
     let mut url_long = url_long.url_long.to_lowercase().clone();
     println!("{}", url_long);
     if !HTTP_REGEX.is_match(&url_long) {
-        println!("No http");
         url_long = "https://".to_owned() + &url_long;
     }
-    println!("{}", url_long);
     return match url::Url::parse(&url_long) {
-        //let ok: Result<String, String> = Ok(url_long.to_owned());
-        //return match ok{
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
             "The URL you entered was not valid.".to_owned(),
@@ -110,68 +90,26 @@ fn shorten(
                 .filter(url.eq(&url_long.to_string()))
                 .first::<Url>(db.connection());
             match existing_short_url {
-                Ok(existing_short_url) => {
-                    // let name1 = unicode_names2::name(
-                    //     existing_short_url.short_url.chars().nth(0).unwrap_or('\0'),
-                    // )
-                    // .map(|name| name.to_string())
-                    // .unwrap_or("<invalid>".to_owned())
-                    // .to_lowercase();
-                    // let name2 = unicode_names2::name(
-                    //     existing_short_url.short_url.chars().nth(1).unwrap_or('\0'),
-                    // )
-                    // .map(|name| name.to_string())
-                    // .unwrap_or("<invalid>".to_owned())
-                    // .to_lowercase();
-                    // return Ok(content::RawHtml(format!(
-                    //     include_str!("../templates/result.html"),
-                    //     server_url, existing_short_url.short_url, name1, name2
-                    // )));
-                    Ok(index(db))
-                }
+                Ok(_existing_short_url) => Ok(index(db)),
                 Err(_) => {
                     //No short url exists for this url, generate a new one.
-                    let character1 = generator.random_codepoint();
-                    let character2 = generator.random_codepoint();
-                    let url_short: String = character1.to_string() + &character2.to_string();
-                    println!("Character1: U+{:X}", character1 as u32);
-                    println!("Character2: U+{:X}", character2 as u32);
+                    let chars = [generator.random_codepoint(), generator.random_codepoint()];
+                    let url_short: String = chars[0].to_string() + &chars[1].to_string();
 
-                    println!(
-                        "Inserted, result was {:?}",
-                        insert_into(urls)
-                            .values((
-                                url.eq(&url_long.to_string()),
-                                short_url.eq(url_short.clone()),
-                                timestamp.eq(chrono::offset::Utc::now().naive_utc()),
-                            ))
-                            .execute(db.connection())
-                    );
+                    insert_into(urls)
+                        .values((
+                            url.eq(&url_long.to_string()),
+                            short_url.eq(url_short.clone()),
+                            timestamp.eq(chrono::offset::Utc::now().naive_utc()),
+                        ))
+                        .execute(db.connection())
+                        .expect("Could not insert into DB");
 
-                    // let name1 = unicode_names2::name(character1)
-                    //     .map(|name| name.to_string())
-                    //     .unwrap_or("<invalid>".to_owned())
-                    //     .to_lowercase();
-                    // let name2 = unicode_names2::name(character2)
-                    //     .map(|name| name.to_string())
-                    //     .unwrap_or("<invalid>".to_owned())
-                    //     .to_lowercase();
-
-                    // println!(
-                    //     "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
-                    //     url_short, name1, character1 as u32, name2, character2 as u32
-                    // );
-                    // return Ok(content::RawHtml(format!(
-                    //     include_str!("../templates/result.html"),
-                    //     server_url, url_short, name1, name2
-                    // )));
                     Ok(index(db))
                 }
             }
         }
     };
-
-    //let character = url_codepoint::random_codepoint();
 }
 
 #[get("/<url_short>")]
@@ -199,8 +137,5 @@ fn rocket() -> _ {
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::new())
         .attach(Template::fairing())
-        // .mount("/static", StaticFiles::from("/static"))
-        //.manage(Regex::new(r"^(?:http(s)?://)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$").unwrap())
-        //.mount("/shorten", routes![shorten])
         .mount("/", routes![resolve, index, shorten, css])
 }

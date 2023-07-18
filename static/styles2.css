@@ -260,7 +260,9 @@ input.short_url {
 }
 
 th.short_url {
-  width: 18ch;
+  white-space: nowrap;
+  display: inline-block;
+  width: 20ch;
 }
 
 /* th.long_url {
@@ -285,4 +287,13 @@ th.date {
 
 a {
   color: inherit;
+}
+img.copy {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  border-radius: 50%;
+  background-color: #C9CED6;
+  padding: 0.2em;
+  vertical-align: middle;
 }

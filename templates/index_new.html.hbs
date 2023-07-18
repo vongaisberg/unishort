@@ -29,6 +29,7 @@
             <tr>
                 <td class="short_url"><input class="short_url" type="text" value="{{../server_url}}/{{short_url}}" readonly
                         onClick="this.select();">
+                        <img class="copy" src="https://pinch.to/static/copy.svg" alt="{{../server_url}}/{{short_url}}" onClick="navigator.clipboard.writeText(this.alt); this.src='https://pinch.to/static/check.svg'">
                 </td>
                 <td class="long_url">
                     <span class="no_linebreak">
