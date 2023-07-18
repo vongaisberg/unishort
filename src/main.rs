@@ -93,7 +93,7 @@ fn shorten(
     generator: &State<url_codepoint::CodepointGenerator>,
     //  url_verifier: State<Regex>,
 ) -> Result<Template, status::Custom<String>> {
-    let mut url_long = url_long.url_long.clone();
+    let mut url_long = url_long.url_long.to_lowercase().clone();
     println!("{}", url_long);
     if !HTTP_REGEX.is_match(&url_long) {
         println!("No http");
@@ -113,18 +113,18 @@ fn shorten(
                 .first::<Url>(db.connection());
             match existing_short_url {
                 Ok(existing_short_url) => {
-                    let name1 = unicode_names2::name(
-                        existing_short_url.short_url.chars().nth(0).unwrap_or('\0'),
-                    )
-                    .map(|name| name.to_string())
-                    .unwrap_or("<invalid>".to_owned())
-                    .to_lowercase();
-                    let name2 = unicode_names2::name(
-                        existing_short_url.short_url.chars().nth(1).unwrap_or('\0'),
-                    )
-                    .map(|name| name.to_string())
-                    .unwrap_or("<invalid>".to_owned())
-                    .to_lowercase();
+                    // let name1 = unicode_names2::name(
+                    //     existing_short_url.short_url.chars().nth(0).unwrap_or('\0'),
+                    // )
+                    // .map(|name| name.to_string())
+                    // .unwrap_or("<invalid>".to_owned())
+                    // .to_lowercase();
+                    // let name2 = unicode_names2::name(
+                    //     existing_short_url.short_url.chars().nth(1).unwrap_or('\0'),
+                    // )
+                    // .map(|name| name.to_string())
+                    // .unwrap_or("<invalid>".to_owned())
+                    // .to_lowercase();
                     // return Ok(content::RawHtml(format!(
                     //     include_str!("../templates/result.html"),
                     //     server_url, existing_short_url.short_url, name1, name2
@@ -150,19 +150,19 @@ fn shorten(
                             .execute(db.connection())
                     );
 
-                    let name1 = unicode_names2::name(character1)
-                        .map(|name| name.to_string())
-                        .unwrap_or("<invalid>".to_owned())
-                        .to_lowercase();
-                    let name2 = unicode_names2::name(character2)
-                        .map(|name| name.to_string())
-                        .unwrap_or("<invalid>".to_owned())
-                        .to_lowercase();
+                    // let name1 = unicode_names2::name(character1)
+                    //     .map(|name| name.to_string())
+                    //     .unwrap_or("<invalid>".to_owned())
+                    //     .to_lowercase();
+                    // let name2 = unicode_names2::name(character2)
+                    //     .map(|name| name.to_string())
+                    //     .unwrap_or("<invalid>".to_owned())
+                    //     .to_lowercase();
 
-                    println!(
-                        "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
-                        url_short, name1, character1 as u32, name2, character2 as u32
-                    );
+                    // println!(
+                    //     "Character: {} ({}) [U+{:X}] ({}) [U+{:X}]",
+                    //     url_short, name1, character1 as u32, name2, character2 as u32
+                    // );
                     // return Ok(content::RawHtml(format!(
                     //     include_str!("../templates/result.html"),
                     //     server_url, url_short, name1, name2
