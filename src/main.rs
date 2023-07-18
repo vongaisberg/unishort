@@ -11,11 +11,9 @@ extern crate url;
 #[macro_use]
 extern crate lazy_static;
 
-pub mod codepoint_list;
 pub mod db;
 pub mod models;
 pub mod schema;
-pub mod unicode_table;
 pub mod url_codepoint;
 
 use diesel::prelude::*;
@@ -83,7 +81,7 @@ fn shorten(
     return match url::Url::parse(&url_long) {
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
-            "The URL you entered was not valid.".to_owned(),
+            "The URL you entered was not valid.".to_owned()
         )),
         Ok(_) => {
             //No short url exists for this url, generate a new one.
@@ -127,7 +125,7 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(db::initialize(15))
-        .manage(url_codepoint::CodepointGenerator::new())
+        .manage(url_codepoint::CodepointGenerator::default())
         .attach(Template::fairing())
         .mount("/", routes![resolve, index, shorten, css])
 }

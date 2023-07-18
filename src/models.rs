@@ -1,7 +1,6 @@
 use crate::schema::urls;
 use diesel::Insertable;
 use serde_derive::Serialize;
-use std::time::SystemTime;
 
 #[derive(Queryable, Insertable, Serialize)]
 pub struct Url {
