@@ -265,9 +265,9 @@ th.short_url {
   width: 20ch;
 }
 
-/* th.long_url {
-  width: 30%;
-} */
+td.long_url {
+  padding-left: 0px;
+}
 th.qr {
   width: 4em;
   
@@ -278,7 +278,11 @@ td.qr {
 }
 
 th.clicks {
-  width: 10ch;
+  width: 8ch;
+
+}
+td.clicks {
+  padding-right: 0px;
 }
 
 th.date {
