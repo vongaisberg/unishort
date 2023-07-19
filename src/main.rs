@@ -45,8 +45,7 @@ struct ShortenTask {
     url_long: String,
 }
 
-#[get("/")]
-fn index(db: db::Connection) -> Template {
+fn render_template(db: db::Connection, new: bool) -> Template {
     let links = urls
         .order_by(timestamp.desc())
         .limit(10)
@@ -59,8 +58,13 @@ fn index(db: db::Connection) -> Template {
     println!("{}", env::var("URL").unwrap());
     Template::render(
         "index_new",
-        context! {regex: URL_REGEX, url_counter: count, links: links, server_url: env::var("URL").unwrap()},
+        context! {regex: URL_REGEX, url_counter: count, links: links, server_url: env::var("URL").unwrap(), new: (if new {"new"} else {""})},
     )
+}
+
+#[get("/")]
+fn index(db: db::Connection) -> Template {
+    render_template(db, false)
 }
 #[get("/styles.css")]
 async fn css() -> Result<NamedFile, std::io::Error> {
@@ -72,7 +76,7 @@ fn shorten(
     url_long: Form<ShortenTask>,
     db: db::Connection,
     generator: &State<url_codepoint::CodepointGenerator>,
-) -> Result<Template, status::Custom<String>> {
+) -> Result<Redirect, status::Custom<String>> {
     let mut url_long = url_long.url_long.to_lowercase().clone();
     println!("{}", url_long);
     if !HTTP_REGEX.is_match(&url_long) {
@@ -81,7 +85,7 @@ fn shorten(
     return match url::Url::parse(&url_long) {
         Err(_) => Err(status::Custom(
             Status::UnprocessableEntity,
-            "The URL you entered was not valid.".to_owned()
+            "The URL you entered was not valid.".to_owned(),
         )),
         Ok(_) => {
             //No short url exists for this url, generate a new one.
@@ -97,7 +101,7 @@ fn shorten(
                 .execute(db.connection())
                 .expect("Could not insert into DB");
 
-            Ok(index(db))
+            Ok(Redirect::to(uri!(index)))
         }
     };
 }

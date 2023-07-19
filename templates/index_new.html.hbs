@@ -17,7 +17,8 @@
 
 <div style="overflow-x:auto;">
     <div class="results">
-        <table>
+        <b class="results-head">Recently shortened URLs<b>
+        <table class="results-table {{new}}">
             <tr class="header">
                 <th class="short_url">Short Link</th>
                 <th class="long_url">Original Link</th>
@@ -26,7 +27,7 @@
                 <th class="date">Date</th>
             </tr>
             {{#each links}}
-            <tr>
+            <tr class="body">
                 <td class="short_url"><input class="short_url" type="text" value="{{../server_url}}/{{short_url}}" readonly
                         onClick="this.select();">
                         <img class="copy" src="https://pinch.to/static/copy.svg" alt="{{../server_url}}/{{short_url}}" onClick="navigator.clipboard.writeText(this.alt); this.src='https://pinch.to/static/check.svg'">
@@ -34,7 +35,7 @@
                 <td class="long_url">
                     <span class="no_linebreak">
                         <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}' />
-                        <a href="{{../server_url}}/{{short_url}}" rel="nofollow">{{{url}}}</a>
+                        <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{{url}}}</a>
                     </span>
                 </td>
                 <td class="qr"><img class="qr" src="https://pinch.to/qr/?data={{../server_url}}/{{short_url}}">
@@ -43,20 +44,7 @@
                 <td class="date"><span class="timestamp">{{timestamp}}</span></td>
             </tr>
             {{/each}}
-            {{!-- <tr>
-                <td><input class="short_url" type="text" value="https://🤏.to/ｿṤ" readonly onClick="this.select();">
-                </td>
-                <td>
-                    <span class="no_linebreak">
-                        <img class="favicon" src='https://pinch.to/favicon?domain=www.google.com' />
-                        https://google.com
-                    </span>
-                </td>
-                <td><img class="qr" src="https://pinch.to/qr/?data=https%3A%2F%2Fpinch.to%2Fbb">
-                </td>
-                <td>34</td>
-                <td>15.07.2023</td>
-            </tr> --}}
+
         </table>
     </div>
 </div>

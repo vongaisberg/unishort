@@ -44,6 +44,10 @@ h1 {
   -moz-text-fill-color: transparent;
 }
 
+.gradient-text2 a {
+  text-decoration: none;
+}
+
 .non-transparent {
   -webkit-text-fill-color: #C9CED6;
   -moz-text-fill-color: #C9CED6;
@@ -152,6 +156,10 @@ circle {
   }
 }
 
+.results-head{
+  font-size: 1.3em;
+}
+
 .header {
   background-color: #181E29;
   padding-top: 15px;
@@ -166,7 +174,7 @@ circle {
   overflow-x: auto;
 }
 
-table {
+table.results-table {
   font-size: 2rem;
   border: none;
   border-collapse: collapse;
@@ -176,7 +184,7 @@ table {
 
 }
 
-th:first-of-type {
+th.short_url {
   border-top-left-radius: 10px;
 }
 
@@ -188,11 +196,11 @@ tr:last-of-type td:first-of-type {
   border-bottom-left-radius: 10px;
 }
 
-tr:last-of-type td:last-of-type {
+tr.date:last-of-type td:last-of-type {
   border-bottom-right-radius: 10px;
 }
 
-tr:last-of-type {
+.new tr:nth-of-type(2) {
   /* position:fixed; */
   /* border: none; */
   animation-name: example;
@@ -268,10 +276,12 @@ th.short_url {
 td.long_url {
   padding-left: 0px;
 }
+
 th.qr {
   width: 4em;
-  
+
 }
+
 td.qr {
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -281,6 +291,7 @@ th.clicks {
   width: 8ch;
 
 }
+
 td.clicks {
   padding-right: 0px;
 }
@@ -292,6 +303,7 @@ th.date {
 a {
   color: inherit;
 }
+
 img.copy {
   width: 1em;
   height: 1em;
@@ -300,4 +312,25 @@ img.copy {
   background-color: #C9CED6;
   padding: 0.2em;
   vertical-align: middle;
+}
+
+.head {
+  display: flex;
+}
+
+div.menu {
+  float: right;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+menu {
+  width: fit-content;
+  text-align: right;
+}
+
+td.menu {
+  padding: 0.5em;
+  padding-right: 1em;
+  padding-left: 1em;
 }
