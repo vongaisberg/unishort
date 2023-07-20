@@ -2,7 +2,7 @@
 <div style="max-width: 800px; margin: auto; margin-top: 10%;">
     <h1 style="font-size: 3.5em; "><span class="gradient-text">Make your URLs this <span
                 class="non-transparent">🤏</span> short</span></h1><br>
-    <h5>pinch.to produces the shortest links in the world by using the full spectrum of unicode characters.</h5>
+    <span class="subtitle">pinch.to produces the shortest links in the world by using the full spectrum of unicode characters.</span>
     <div id="box">
         <form action="/" method="post">
             <!-- <label for="url_long">Enter your long URL here:</label> -->
@@ -20,7 +20,7 @@
         <b class="results-head">Recently shortened URLs<b>
                 <table class="results-table {{new}}">
                     <tr class="header">
-                        <th class="short_url">Short Link</th>
+                        <th class="short_url"><labal for="short_url">Short Link</labal></th>
                         <th class="long_url">Original Link</th>
                         <th class="qr">QR</th>
                         <th class="clicks">Clicks</th>
@@ -28,7 +28,7 @@
                     </tr>
                     {{#each links}}
                     <tr class="body">
-                        <td class="short_url"><input class="short_url" type="text"
+                        <td class="short_url" id="short_url"><input class="short_url" type="text"
                                 value="{{../server_url}}/{{short_url}}" readonly onClick="this.select();">
                             <img class="copy" src="https://pinch.to/static/copy.svg"
                                 alt="{{../server_url}}/{{short_url}}"
@@ -37,11 +37,11 @@
                         <td class="long_url">
                             <span class="no_linebreak">
                                 <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}'
-                                    alt="Favicon of {{url}}" />
+                                    alt="" />
                                 <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{{url}}}</a>
                             </span>
                         </td>
-                        <td class="qr"><img class="qr" src="https://pinch.to/qr/?data={{../server_url}}/{{short_url}}">
+                        <td class="qr"><img class="qr" src="https://pinch.to/qr/?data={{../server_url}}/{{short_url}}" alt="">
                         </td>
                         <td class="clicks">{{clicks}}</td>
                         <td class="date"><span class="timestamp">{{timestamp}}</span></td>

@@ -58,12 +58,15 @@ h3 {
   margin: 0%;
 }
 
-h5 {
+.subtitle {
+  line-height: 1.2;
   font-size: 1.8rem;
   text-align: center;
   position: relative;
   width: 80%;
   margin: auto;
+  font-weight: 300;
+  display: block;
 }
 
 body {
@@ -156,7 +159,7 @@ circle {
   }
 }
 
-.results-head{
+.results-head {
   font-size: 1.3em;
 }
 
