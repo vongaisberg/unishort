@@ -1,8 +1,5 @@
-use rocket::form::Form;
 use rocket::fs::NamedFile;
-use rocket::response::Redirect;
 use rocket::Route;
-use rocket::State;
 
 use rocket_dyn_templates::Template;
 
@@ -13,14 +10,14 @@ use rocket_dyn_templates::Template;
 
 #[get("/about")]
 fn about() -> Template {
-    Template::render("blog/template", {})
+    Template::render("blog/about", ())
+}
+#[get("/top-10-shortest-url-shorteners-2023")]
+fn list() -> Template {
+    Template::render("blog/list", ())
 }
 
-#[get("/styles.css")]
-async fn css() -> Result<NamedFile, std::io::Error> {
-    NamedFile::open("static/styles2.css").await
-}
 
 pub fn get_routes() -> Vec<Route> {
-    routes![about]
+    routes![about, list]
 }
