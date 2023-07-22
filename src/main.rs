@@ -15,6 +15,7 @@ pub mod db;
 pub mod models;
 pub mod schema;
 pub mod url_codepoint;
+pub mod blog;
 
 use diesel::prelude::*;
 use rocket::form::Form;
@@ -124,12 +125,72 @@ fn resolve(
 
 #[launch]
 fn rocket() -> _ {
-    dotenv().ok();
-    println!("Display URL is set to {}", env::var("URL").unwrap());
-
+    #[post("/", data = "<url_long>")]
+    fn shorten(
+        url_long: Form<ShortenTask>,
+        db: db::Connection,
+        generator: &State<url_codepoint::CodepointGenerator>,
+    ) -> Result<Redirect, status::Custom<String>> {
+        let mut url_long = url_long.url_long.to_lowercase().clone();
+        println!("{}", url_long);
+        if !HTTP_REGEX.is_match(&url_long) {
+            url_long = "https://".to_owned() + &url_long;
+        }
+        return match url::Url::parse(&url_long) {
+            Err(_) => Err(status::Custom(
+                Status::UnprocessableEntity,
+                "The URL you entered was not valid.".to_owned(),
+            )),
+            Ok(_) => {
+                //No short url exists for this url, generate a new one.
+                let chars = [generator.random_codepoint(), generator.random_codepoint()];
+                let url_short: String = chars[0].to_string() + &chars[1].to_string();
+    
+                insert_into(urls)
+                    .values((
+                        url.eq(&url_long.to_string()),
+                        short_url.eq(url_short.clone()),
+                        timestamp.eq(chrono::offset::Utc::now().naive_utc()),
+                    ))
+                    .execute(db.connection())
+                    .expect("Could not insert into DB");
+    
+                Ok(Redirect::to(uri!(index)))
+            }
+        };
+    }
+    
+    #[get("/<url_short>")]
+    fn resolve(
+        url_short: String,
+        db: db::Connection,
+        _generator: &State<url_codepoint::CodepointGenerator>,
+    ) -> Option<Redirect> {
+        let _ = diesel::update(urls)
+            .filter(short_url.eq(&url_short))
+            .set(clicks.eq(clicks + 1))
+            .execute(db.connection());
+        urls.filter(short_url.eq(&url_short))
+            .first::<Url>(db.connection())
+            .ok()
+            .map(|result| Redirect::to(result.url))
+    }
+    
+    #[launch]
+    fn rocket() -> _ {
+        dotenv().ok();
+        println!("Display URL is set to {}", env::var("URL").unwrap());
+    
+        rocket::build()
+            .manage(db::initialize(15))
+            .manage(url_codepoint::CodepointGenerator::default())
+            .attach(Template::fairing())
+            .mount("/", routes![resolve, index, shorten, css])
+    }
     rocket::build()
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::default())
         .attach(Template::fairing())
         .mount("/", routes![resolve, index, shorten, css])
+        .mount("/blog", blog::get_routes())
 }
