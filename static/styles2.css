@@ -343,7 +343,7 @@ td.menu {
 div.blog {
   max-width: 650px;
   margin: auto;
-  margin-top: 10%;
+  margin-top: 2rem;
   background-color: rgba(24, 30, 41, 0.5);
   padding: 2em;
   border-radius: 2em;
