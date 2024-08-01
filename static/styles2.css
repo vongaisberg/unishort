@@ -267,7 +267,6 @@ input.short_url {
   max-width: inherit;
   display: block;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
