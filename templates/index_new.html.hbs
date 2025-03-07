@@ -28,7 +28,7 @@
                     </tr>
                     {{#each links}}
                     <tr class="body">
-                        <td class="short_url"><input class="short_url" type="text"
+                        <td class="short_url"><input class="short_url" type="text" aria-label="Shortened URL"
                                 value="{{../server_url}}/{{short_url}}" readonly onClick="this.select();">
                             <img class="copy" src="https://pinch.to/static/copy.svg"
                                 alt="{{../server_url}}/{{short_url}}"

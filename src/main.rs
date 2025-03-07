@@ -71,6 +71,10 @@ fn index(db: db::Connection) -> Template {
 async fn css() -> Result<NamedFile, std::io::Error> {
     NamedFile::open("static/styles2.css").await
 }
+#[get("/copy.svg")]
+async fn copy() -> Result<NamedFile, std::io::Error> {
+    NamedFile::open("static/copy.svg").await
+}
 
 #[post("/", data = "<url_long>")]
 fn shorten(
@@ -185,7 +189,7 @@ fn rocket() -> _ {
             .manage(db::initialize(15))
             .manage(url_codepoint::CodepointGenerator::default())
             .attach(Template::fairing())
-            .mount("/", routes![resolve, index, shorten, css])
+            .mount("/", routes![resolve, index, shorten, css, copy])
     }
     rocket::build()
         .manage(db::initialize(15))
