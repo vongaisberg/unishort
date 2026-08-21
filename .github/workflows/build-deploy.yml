@@ -7,8 +7,11 @@ on:
   workflow_dispatch:
 
 env:
-  # Where CI pushes to: Zot over the tailnet (the runner is outside the cluster).
-  PUSH_REGISTRY: registry.dachshund-minor.ts.net
+  # Where CI pushes to: Zot's NodePort on barnet. The runner is outside the
+  # cluster but on the same subnet as the node, so this is a direct hop --
+  # no tailnet round-trip, no ACL grant. Plain HTTP on a private lab network;
+  # Zot still enforces htpasswd auth.
+  PUSH_REGISTRY: 10.90.0.10:30500
   # What the deployment manifest references: the cluster-internal name, which the
   # k3s node resolves to Zot's ClusterIP via /etc/rancher/k3s/registries.yaml.
   IMAGE_REGISTRY: zot.registry.svc.cluster.local:5000
@@ -38,17 +41,25 @@ jobs:
 
       # Zot is strict OCI-only and rejects Docker V2 manifests with HTTP 415,
       # so push via skopeo with --format oci rather than `docker push`.
+      # Uses docker-archive rather than the docker-daemon transport: Debian's
+      # skopeo speaks an API version too old for current Docker daemons.
       - name: Push to Zot
         env:
           ZOT_USER: ${{ secrets.ZOT_USERNAME }}
           ZOT_PASS: ${{ secrets.ZOT_PASSWORD }}
+          SHA_TAG: ${{ steps.meta.outputs.sha_tag }}
         run: |
+          ARCHIVE="$(mktemp -d)/image.tar"
+          trap 'rm -rf "$(dirname "$ARCHIVE")"' EXIT
+          docker save "${IMAGE}:${SHA_TAG}" -o "$ARCHIVE"
+
           for tag in ${{ steps.meta.outputs.tags }}; do
             echo "Pushing ${PUSH_REGISTRY}/${IMAGE}:${tag}"
             skopeo copy --format oci \
-              "docker-daemon:${IMAGE}:${{ steps.meta.outputs.sha_tag }}" \
+              "docker-archive:${ARCHIVE}" \
               "docker://${PUSH_REGISTRY}/${IMAGE}:${tag}" \
-              --dest-creds "${ZOT_USER}:${ZOT_PASS}"
+              --dest-creds "${ZOT_USER}:${ZOT_PASS}" \
+              --dest-tls-verify=false
           done
 
       - name: Update image tag in sun-gitops
