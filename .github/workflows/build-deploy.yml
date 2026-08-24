@@ -2,7 +2,10 @@ name: Build and deploy
 
 on:
   push:
-    branches: [master]
+    # master -> production, dev -> the gated dev environment at
+    # app-unishort-dev.vongaisberg.de. Both push into the same Zot repository;
+    # tags are commit SHAs, so they cannot collide.
+    branches: [master, dev]
     tags: ['v*']
   workflow_dispatch:
 
@@ -78,8 +81,14 @@ jobs:
           cd /tmp/sun-gitops
 
           # Apps are rendered from the shared chart in charts/app, so the image
-          # lives in the app's values file, not in a deployment.yaml.
+          # lives in the app's values file, not in a deployment.yaml. The dev
+          # branch bumps the overlay instead, which is the only key it shares
+          # with production's file.
           DEPLOY_FILE="apps/${IMAGE}/values.yaml"
+          if [ "${GITHUB_REF_NAME}" = "dev" ]; then
+            DEPLOY_FILE="apps/${IMAGE}/dev.yaml"
+          fi
+          echo "Updating ${DEPLOY_FILE}"
           sed -i -E "s|(image: ${IMAGE_REGISTRY}/${IMAGE}):.*|\1:${NEW_TAG}|" "$DEPLOY_FILE"
 
           # Fail loudly rather than committing nothing if the line ever moves.
@@ -97,7 +106,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add "$DEPLOY_FILE"
-          git commit -m "${IMAGE}: deploy ${NEW_TAG}" \
+          git commit -m "${IMAGE}: deploy ${NEW_TAG} to ${GITHUB_REF_NAME}" \
             -m "Built from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
           git push origin main
 
