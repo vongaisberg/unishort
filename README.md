@@ -21,3 +21,12 @@ out. Tagging a commit `v*` additionally publishes that semver tag.
 
 Reachable at `app-unishort.vongaisberg.de` publicly and
 `unishort.dachshund-minor.ts.net` over Tailscale.
+
+## Branches
+
+`master` deploys to production at `https://app-unishort.vongaisberg.de`.
+
+`dev` deploys to `https://app-unishort-dev.vongaisberg.de`, which sits behind a
+Keycloak login — external contributors need an account in the `sun` realm's
+`apps-users` group. Both branches build through the same pipeline and push
+SHA-tagged images to the same registry; only the manifest they update differs.
