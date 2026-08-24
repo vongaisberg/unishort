@@ -77,8 +77,16 @@ jobs:
           git clone git@github.com:vongaisberg/sun-gitops.git /tmp/sun-gitops
           cd /tmp/sun-gitops
 
-          DEPLOY_FILE="apps/${IMAGE}/deployment.yaml"
+          # Apps are rendered from the shared chart in charts/app, so the image
+          # lives in the app's values file, not in a deployment.yaml.
+          DEPLOY_FILE="apps/${IMAGE}/values.yaml"
           sed -i -E "s|(image: ${IMAGE_REGISTRY}/${IMAGE}):.*|\1:${NEW_TAG}|" "$DEPLOY_FILE"
+
+          # Fail loudly rather than committing nothing if the line ever moves.
+          if ! grep -q "image: ${IMAGE_REGISTRY}/${IMAGE}:${NEW_TAG}" "$DEPLOY_FILE"; then
+            echo "::error::image line not found in ${DEPLOY_FILE}" >&2
+            exit 1
+          fi
 
           if git diff --quiet; then
             echo "Image tag already ${NEW_TAG}, nothing to commit."
