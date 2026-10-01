@@ -1,11 +1,10 @@
 use rand::rngs::ThreadRng;
 use rand::Rng;
-use rand_regex;
 use std::char::from_u32;
 use std::ops::Range;
 
 static FORBIDDEN_CODEPOINTS: [u32; 14] = [
-    0x0022, 0x0223, 0x0025, 0x003C, 0x003E, 0x005B, 0x005C, 0x005D, 0x005E, 0x0060, 0x007B, 0x007C,
+    0x0022, 0x0023, 0x0025, 0x003C, 0x003E, 0x005B, 0x005C, 0x005D, 0x005E, 0x0060, 0x007B, 0x007C,
     0x007D, 0x007F,
 ];
 static FORBIDDEN_RANGES: [Range<u32>; 2] = [(0xD800..0xE000), (0xFDD0..0xFDF0)];
@@ -48,7 +47,6 @@ impl CodepointGenerator {
                         .unwrap_or("<invalid>".to_owned())
                         .to_lowercase();
                     if (name.contains("cjk") || name.contains("<invalid>")) && rng.gen_bool(0.9) {
-                        println!("Reject CJK");
                         // Refuse CJK Codepoints (most of the time).
                         continue;
                     }

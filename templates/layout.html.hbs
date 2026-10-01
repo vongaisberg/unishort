@@ -3,8 +3,8 @@
 
 <head>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YBZ6ZP6JY0"></script>
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="icon" href="static/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"> -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,12 +12,11 @@
     <meta name="description" content="{{ description }}">
 
     <meta property="og:title" content="{{ title }}" />
-    <meta property="og:image" content="https://pinch.to/static/card.png" />
     <meta property="og:description" content="{{ description }}">
-    <meta property="og:url" content="https://pinch.to">
+    <meta property="og:url" content="{{ server_url }}">
 
 
-    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:card" content="summary">
     <script>
         function time() {
             var elems = document.getElementsByClassName("timestamp")
@@ -39,7 +38,7 @@
         <circle cx="50%" cy="40%" r="300" />
         <circle cx="50%" cy="40%" r="350" />
         <circle cx="50%" cy="40%" r="400" />
-        <circle cx="50%" cy="40%" r="450" />K
+        <circle cx="50%" cy="40%" r="450" />
         <circle cx="50%" cy="40%" r="500" />
         <circle cx="50%" cy="40%" r="550" />
         <circle cx="50%" cy="40%" r="600" />
@@ -50,7 +49,7 @@
         <circle cx="50%" cy="40%" r="850" />
     </svg>
     <div class="head">
-        <h3><span class="gradient-text2"><a href="https://pinch.to">pinch.to</a></span></h3>
+        <h3><span class="gradient-text2"><a href="/">pinch.to</a></span></h3>
         <div class="menu">
             <table class="menu">
                 <tr>
