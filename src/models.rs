@@ -1,8 +1,6 @@
-use crate::schema::urls;
-use diesel::Insertable;
 use serde_derive::Serialize;
 
-#[derive(Queryable, Insertable, Serialize)]
+#[derive(Queryable, Serialize)]
 pub struct Url {
     pub id: i32,
     pub url: String,

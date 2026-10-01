@@ -1,9 +1,7 @@
 use diesel::pg::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use diesel::r2d2::{ConnectionManager, Pool};
 use rocket::http::Status;
-use rocket::outcome::Outcome;
-use rocket::request::{self, FromRequest};
-use rocket::Request;
+use rocket::tokio::task;
 
 use dotenv::dotenv;
 use std::env;
@@ -20,26 +18,31 @@ pub fn initialize(max_size: u32) -> PgPool {
         .expect("Failed to create pool")
 }
 
-pub struct Connection(pub PooledConnection<ConnectionManager<PgConnection>>);
-
-/// Attempts to retrieve a single connection from the managed database pool. If
-/// no pool is currently managed, fails with an `InternalServerError` status. If
-/// no connections are available, fails with a `ServiceUnavailable` status.
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for Connection {
-    type Error = ();
-
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<Self, ()> {
-        let pool = request.rocket().state::<PgPool>().unwrap();
-        match pool.get() {
-            Ok(conn) => Outcome::Success(Connection(conn)),
-            Err(_) => Outcome::Failure((Status::ServiceUnavailable, ())),
+/// Runs `f` with a pooled connection on Tokio's blocking thread pool.
+///
+/// Diesel and r2d2 are synchronous: checking out a connection can wait for
+/// the pool timeout, and every query blocks until Postgres answers. Doing
+/// that on an async worker would stall every other request on that thread.
+///
+/// Fails with `ServiceUnavailable` when no connection can be checked out.
+/// The closure's own result (usually a `QueryResult`) is passed through
+/// untouched, so callers can still tell query errors apart.
+pub async fn run<T, F>(pool: &PgPool, f: F) -> Result<T, Status>
+where
+    F: FnOnce(&PgConnection) -> T + Send + 'static,
+    T: Send + 'static,
+{
+    let pool = pool.clone();
+    task::spawn_blocking(move || match pool.get() {
+        Ok(conn) => Ok(f(&conn)),
+        Err(e) => {
+            log::error!("Could not get a database connection: {}", e);
+            Err(Status::ServiceUnavailable)
         }
-    }
-}
-
-impl Connection {
-    pub fn connection(&self) -> &PgConnection {
-        &self.0
-    }
+    })
+    .await
+    .map_err(|e| {
+        log::error!("Database task failed: {}", e);
+        Status::InternalServerError
+    })?
 }

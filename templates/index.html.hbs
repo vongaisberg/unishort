@@ -6,10 +6,11 @@
     <div id="box">
         <form action="/" method="post">
             <!-- <label for="url_long">Enter your long URL here:</label> -->
-            <input placeholder="Paste your long URL here" pattern="{{regex}}" required autofocus id="url_long"
+            <input placeholder="Paste your long URL here" pattern="\s*\S+[.:]\S+\s*" title="A web address, like example.com/page" required autofocus id="url_long"
                 name="url_long">
             <button id="submit" type="submit">Shorten Now!</button>
         </form>
+        {{#if error}}<p class="error">{{error}}</p>{{/if}}
     </div>
 
 
@@ -17,7 +18,7 @@
 
 <div style="overflow-x:auto;">
     <div class="results">
-        <b class="results-head">Recently shortened URLs<b>
+        <b class="results-head">Recently shortened URLs</b>
                 <table class="results-table {{new}}">
                     <tr class="header">
                         <th class="short_url">Short Link</th>
@@ -30,15 +31,15 @@
                     <tr class="body">
                         <td class="short_url"><input class="short_url" type="text" aria-label="Shortened URL"
                                 value="{{../server_url}}/{{short_url}}" readonly onClick="this.select();">
-                            <img class="copy" src="https://pinch.to/static/copy.svg"
+                            <img class="copy" src="/static/copy.svg"
                                 alt="{{../server_url}}/{{short_url}}"
-                                onClick="navigator.clipboard.writeText(this.alt); this.src='https://pinch.to/static/check.svg'">
+                                onClick="navigator.clipboard.writeText(this.alt); this.src='/static/check.svg'">
                         </td>
                         <td class="long_url">
                             <span class="no_linebreak">
                                 <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}'
                                     alt="" />
-                                <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{{url}}}</a>
+                                <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{display_url}}</a>
                             </span>
                         </td>
                         <td class="qr"><img class="qr" src=" https://api.qrserver.com/v1/create-qr-code/?data={{../server_url}}/{{short_url}}" alt="">

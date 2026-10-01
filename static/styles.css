@@ -360,3 +360,7 @@ h1.blog_header {
   margin-bottom: 0em;
 
 }
+.error {
+  text-align: center;
+  color: #c0392b;
+}
