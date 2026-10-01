@@ -4,11 +4,15 @@ extern crate rocket;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
+extern crate diesel_migrations;
+#[macro_use]
 extern crate lazy_static;
 
 pub mod blog;
 pub mod db;
+pub mod favicon;
 pub mod models;
+pub mod qr;
 pub mod schema;
 pub mod target_url;
 pub mod url_codepoint;
@@ -16,9 +20,10 @@ pub mod url_codepoint;
 use diesel::insert_into;
 use diesel::prelude::*;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use rocket::fairing::AdHoc;
 use rocket::form::Form;
 use rocket::fs::FileServer;
-use rocket::http::Status;
+use rocket::http::{ContentType, Header, Status};
 use rocket::request::FlashMessage;
 use rocket::response::{status, Flash, Redirect};
 use rocket::State;
@@ -36,6 +41,15 @@ use std::env;
 /// already taken before giving up.
 const MAX_SHORTEN_ATTEMPTS: usize = 10;
 
+/// Everything a page loads comes from this origin. Besides keeping visitors'
+/// browsers from talking to third parties, this stops injected markup from
+/// running script, since there is no inline script to allow.
+const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; \
+    style-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; \
+    frame-ancestors 'none'";
+
+embed_migrations!();
+
 /// The public base URL short links are displayed with, from the `URL` env var.
 pub struct ServerUrl(pub String);
 
@@ -51,6 +65,8 @@ struct LinkView {
     link: Url,
     /// The target with its domain in Unicode instead of punycode.
     display_url: String,
+    /// The target's host, for /favicon/<host>.
+    favicon_host: Option<String>,
 }
 
 #[get("/")]
@@ -71,6 +87,7 @@ async fn index(
         .into_iter()
         .map(|link| LinkView {
             display_url: target_url::display(&link.url),
+            favicon_host: target_url::host(&link.url),
             link,
         })
         .collect();
@@ -157,6 +174,28 @@ async fn resolve(url_short: String, pool: &State<PgPool>) -> Result<Option<Redir
     })
 }
 
+/// Brings the schema up to date before the first request. A failure is
+/// logged but does not stop the app: the links table predates these
+/// migrations, so the site keeps working, and only what a missing
+/// migration adds (such as favicons) is unavailable.
+async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::Rocket<rocket::Build> {
+    let pool = match rocket.state::<PgPool>() {
+        Some(pool) => pool.clone(),
+        None => return rocket,
+    };
+    let result = rocket::tokio::task::spawn_blocking(move || {
+        let conn = pool.get().map_err(|e| e.to_string())?;
+        embedded_migrations::run(&*conn).map_err(|e| e.to_string())
+    })
+    .await;
+    match result {
+        Ok(Ok(())) => log::info!("Database schema is up to date"),
+        Ok(Err(e)) => log::error!("Could not run database migrations: {}", e),
+        Err(e) => log::error!("Migration task failed: {}", e),
+    }
+    rocket
+}
+
 #[launch]
 fn rocket() -> _ {
     dotenv().ok();
@@ -167,8 +206,23 @@ fn rocket() -> _ {
         .manage(db::initialize(15))
         .manage(url_codepoint::CodepointGenerator::default())
         .manage(ServerUrl(server_url))
+        .manage(favicon::Client::new())
+        .attach(AdHoc::on_ignite("Database migrations", run_migrations))
         .attach(Template::fairing())
-        .mount("/", routes![resolve, index, shorten])
+        .attach(AdHoc::on_response("Content-Security-Policy", |_, response| {
+            Box::pin(async move {
+                if response.content_type() == Some(ContentType::HTML) {
+                    response.set_header(Header::new(
+                        "Content-Security-Policy",
+                        CONTENT_SECURITY_POLICY,
+                    ));
+                }
+            })
+        }))
+        .mount(
+            "/",
+            routes![resolve, index, shorten, qr::qr, favicon::favicon],
+        )
         .mount("/static", FileServer::from("static"))
         .mount("/blog", blog::get_routes())
 }

@@ -20,6 +20,9 @@ idna = "1"
 rand_regex = "0.14.2"
 regex = "1.3.9"
 lazy_static = "1.4.0"
+qrcode = { version = "0.14", default-features = false, features = ["svg"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+diesel_migrations = "1.4"
 # minify_html_macro = { path = "../minify_html_macro" }
 
 
