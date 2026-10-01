@@ -1,6 +1,6 @@
 {{#*inline "page"}}
-<div style="max-width: 800px; margin: auto; margin-top: 10%;">
-    <h1 style="font-size: 3.5em; "><span class="gradient-text">Make your URLs this <span
+<div class="hero">
+    <h1 class="hero-title"><span class="gradient-text">Make your URLs this <span
                 class="non-transparent">🤏</span> short</span></h1><br>
     <span class="subtitle">pinch.to produces the shortest links in the world by using the full spectrum of unicode characters.</span>
     <div id="box">
@@ -16,7 +16,7 @@
 
 </div>
 
-<div style="overflow-x:auto;">
+<div class="results-scroll">
     <div class="results">
         <b class="results-head">Recently shortened URLs</b>
                 <table class="results-table {{new}}">
@@ -30,19 +30,17 @@
                     {{#each links}}
                     <tr class="body">
                         <td class="short_url"><input class="short_url" type="text" aria-label="Shortened URL"
-                                value="{{../server_url}}/{{short_url}}" readonly onClick="this.select();">
+                                value="{{../server_url}}/{{short_url}}" readonly>
                             <img class="copy" src="/static/copy.svg"
-                                alt="{{../server_url}}/{{short_url}}"
-                                onClick="navigator.clipboard.writeText(this.alt); this.src='/static/check.svg'">
+                                alt="{{../server_url}}/{{short_url}}">
                         </td>
                         <td class="long_url">
                             <span class="no_linebreak">
-                                <img class="favicon" src='https://www.google.com/s2/favicons?domain={{url}}'
-                                    alt="" />
+                                {{#if favicon_host}}<img class="favicon" src="/favicon/{{favicon_host}}" alt="" />{{/if}}
                                 <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{display_url}}</a>
                             </span>
                         </td>
-                        <td class="qr"><img class="qr" src=" https://api.qrserver.com/v1/create-qr-code/?data={{../server_url}}/{{short_url}}" alt="">
+                        <td class="qr"><img class="qr" src="/qr/{{short_url}}" alt="">
                         </td>
                         <td class="clicks">{{clicks}}</td>
                         <td class="date"><span class="timestamp">{{timestamp}}</span></td>

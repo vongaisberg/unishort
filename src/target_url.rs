@@ -71,6 +71,12 @@ pub fn display(target: &str) -> String {
     }
 }
 
+/// The host of a stored link target, as the `url` crate serializes it:
+/// punycode for international domains, even in rows stored as Unicode.
+pub fn host(target: &str) -> Option<String> {
+    Url::parse(target).ok()?.host_str().map(str::to_owned)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -134,6 +140,14 @@ mod tests {
         assert_eq!(norm("example.c"), None);
         assert_eq!(norm(""), None);
         assert_eq!(norm("not a url"), None);
+    }
+
+    #[test]
+    fn hosts_are_punycode_even_for_unicode_rows() {
+        assert_eq!(host("https://müller.de/raw").as_deref(), Some("xn--mller-kva.de"));
+        assert_eq!(host("https://example.com:8443/").as_deref(), Some("example.com"));
+        assert_eq!(host("http://[::1]/").as_deref(), Some("[::1]"));
+        assert_eq!(host("not a url"), None);
     }
 
     #[test]

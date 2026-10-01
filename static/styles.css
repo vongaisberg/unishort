@@ -364,3 +364,17 @@ h1.blog_header {
   text-align: center;
   color: #c0392b;
 }
+
+.hero {
+  max-width: 800px;
+  margin: auto;
+  margin-top: 10%;
+}
+
+h1.hero-title {
+  font-size: 3.5em;
+}
+
+.results-scroll {
+  overflow-x: auto;
+}
