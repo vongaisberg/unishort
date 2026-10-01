@@ -1,4 +1,6 @@
-FROM rustlang/rust:nightly AS build
+# Same Debian release as the runtime stage below, so the binary never links
+# against a newer glibc than the one it runs on.
+FROM docker.io/library/rust:1.98-bookworm AS build
 
 ## cargo package name: customize here or provide via --build-arg
 ARG pkg=url-shortener
@@ -11,31 +13,30 @@ RUN --mount=type=cache,target=/build/target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     set -eux; \
-    cargo build --release; \
+    cargo build --release --locked; \
     objcopy --compress-debug-sections target/release/$pkg ./main
 
 ################################################################################
 
 FROM docker.io/debian:bookworm-slim
 
-## Install postgres library
+## Postgres client library; diesel links against it
 RUN apt-get update && \
-    apt-get install libpq-dev -y && \
-    apt-get clean && \
+    apt-get install -y --no-install-recommends libpq5 && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-## copy the main binary
 COPY --from=build /build/main ./
+COPY --from=build /build/static ./static
+COPY --from=build /build/templates ./templates
 
-## copy runtime assets which may or may not exist
-COPY --from=build /build/Rocket.tom[l] ./static
-COPY --from=build /build/stati[c] ./static
-COPY --from=build /build/template[s] ./templates
-
-## ensure the container listens globally on port 8080
+## Unprivileged port, so the app does not need root to bind it. The uid
+## matches runAsUser in sun-gitops.
 ENV ROCKET_ADDRESS=0.0.0.0
-ENV ROCKET_PORT=80
+ENV ROCKET_PORT=8080
+EXPOSE 8080
+USER 1000:1000
 
-CMD ./main
+## Exec form: main runs as PID 1 and receives SIGTERM directly
+CMD ["./main"]
