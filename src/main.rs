@@ -160,11 +160,14 @@ async fn resolve(url_short: String, pool: &State<PgPool>) -> Result<Option<Redir
             .optional()
     })
     .await?
+    // A 302, not a 301: browsers cache permanent redirects, and later clicks
+    // would never reach us to be counted.
+    //
     // Rows from before URLs were normalized can hold raw Unicode, which is
     // not a valid Location header; re-serializing through `url` fixes that.
     .map(|target| {
         target.map(|target| {
-            Redirect::to(::url::Url::parse(&target).map_or(target, String::from))
+            Redirect::found(::url::Url::parse(&target).map_or(target, String::from))
         })
     })
     .map_err(|e| {
