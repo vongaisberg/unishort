@@ -1,32 +1,26 @@
 # unishort
-An URL shortener that uses (almost) the full Unicode range to create the shortest URLs possible.
 
-The URLs created by this shortener are only seven characters long, about half as long as the URLs of bit.ly
+A URL shortener that uses (almost) the full Unicode range to make short links
+of two code points, like `🤏.to/ꙮ𐐀`. Hosted at [🤏.to](https://🤏.to).
 
-Hosted at [🤏.to](http://🤏.to)
+Rust (Rocket, Diesel, Postgres). Pages load nothing from third parties: QR
+codes are rendered here and favicons are proxied and stored in Postgres.
 
-## Todo
-- [x] Proof of concept
-- [x] Accept scheme-less URLs (google.com instead of https://google.com)
-- [ ] Improve design
-- [ ] Write an API specification (should be very easy)
+## Running locally
+
+```sh
+export DATABASE_URL=postgres://user:pass@localhost/unishort URL=http://localhost:8000
+cargo run      # applies pending migrations at startup
+cargo test
+```
 
 ## Deployment
 
-Runs on the `sun` k3s cluster. Pushing to `master` triggers
-`.github/workflows/build-deploy.yml`, which builds the image, pushes it to the
-self-hosted Zot registry, and commits the new image tag to
-[sun-gitops](https://github.com/vongaisberg/sun-gitops); Argo CD then rolls it
-out. Tagging a commit `v*` additionally publishes that semver tag.
+Runs on the `sun` k3s cluster. A push builds the image
+(`.github/workflows/build-deploy.yml`), pushes it to the Zot registry and
+commits the tag to [sun-gitops](https://github.com/vongaisberg/sun-gitops),
+where Argo CD rolls it out.
 
-Reachable at `app-unishort.vongaisberg.de` publicly and
-`unishort.dachshund-minor.ts.net` over Tailscale.
-
-## Branches
-
-`master` deploys to production at `https://app-unishort.vongaisberg.de`.
-
-`dev` deploys to `https://app-unishort-dev.vongaisberg.de`, which sits behind a
-Keycloak login — external contributors need an account in the `sun` realm's
-`apps-users` group. Both branches build through the same pipeline and push
-SHA-tagged images to the same registry; only the manifest they update differs.
+- `dev` → `https://app-unishort-dev.vongaisberg.de` (behind Keycloak, `sun`
+  realm, `apps-users` group). Check changes here first.
+- `master` → `https://app-unishort.vongaisberg.de`. Merge `dev` into it.
