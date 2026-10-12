@@ -351,6 +351,50 @@ div.blog {
 
 
 
+div.blog h3 {
+  font-size: 1.15em;
+  font-weight: 400;
+  margin-top: 1.5em;
+}
+
+div.home-info {
+  margin-top: 6em;
+  margin-bottom: 4em;
+}
+
+.blog-scroll {
+  overflow-x: auto;
+}
+
+table.compare {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table.compare th,
+table.compare td {
+  padding: 0.4em 0.6em;
+  text-align: left;
+  border-bottom: 1px solid #353C4A;
+}
+
+table.compare .num {
+  text-align: right;
+}
+
+table.compare tr.us {
+  font-weight: 600;
+}
+
+div.blog code {
+  white-space: nowrap;
+}
+
+p.note {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
 h1.blog_header {
   line-height: 1.2;
   font-weight: 300;

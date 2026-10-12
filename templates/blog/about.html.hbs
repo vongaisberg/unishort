@@ -1,64 +1,42 @@
 {{#*inline "page"}}
 <div class="blog">
-    <h1 class="blog_header"><span class="gradient-text">About Pinch.to - The World's Shortest URL Shortener</span></h1>
+    <h1 class="blog_header"><span class="gradient-text">About pinch.to, the shortest URL shortener</span></h1>
 
-    <p>Welcome to Pinch.to, the kingpin of compact URLs!</p>
-    <p>At Pinch.to, we've cracked the code to create the shortest links in existence by unleashing the full potential of
-        Unicode characters. It's like a URL magic show - we take those cumbersome web addresses and shrink them down to
-        mere
-        🤏s.</p>
+    <p>pinch.to turns any web address into a link of seven characters, like <code>🤏.to/ꙮ𐐀</code>. It is free, needs
+        no account and shows no ads.</p>
 
-    <h2>Why Pinch.to?</h2>
+    <h2>How it works</h2>
+    <p><strong>The domain.</strong> <code>🤏.to</code> is a real domain: the pinching-hand emoji on Tonga's
+        <code>.to</code> ending. Domain names can only travel as plain ASCII, so behind the scenes browsers turn it into
+        <code>xn--rp9h.to</code>, a format called punycode, and back into 🤏 for display.</p>
+    <p><strong>The code.</strong> Most shorteners make codes from the 62 Latin letters and digits. pinch.to picks two
+        letters at random from about 131,000 letters in Unicode's scripts: Greek, Cyrillic, Hangul, Ethiopic, Cherokee,
+        Old Italic and many more. That gives about 17 billion possible codes. Codes never use punctuation, symbols or
+        invisible characters, which could break a link or make two links look alike.</p>
+    <p><strong>The redirect.</strong> Opening a pinch.to link counts the click and sends you on to the original
+        address. Every code also works on <code>pinch.to</code>, so <code>pinch.to/ꙮ𐐀</code> and
+        <code>🤏.to/ꙮ𐐀</code> are the same link, for apps that do not recognise an emoji domain as a link.</p>
+
+    <h2>What it is good for, and what not</h2>
+    <p>The links are short to look at: in a post, on a slide, on a sticker or a business card. They are not easy to type. Browsers send <code>🤏.to/ꙮ𐐀</code> as
+        <code>xn--rp9h.to/%EA%99%AE%F0%90%90%80</code>, and few keyboards have a <code>ꙮ</code>.
+        <a href="/blog/shortest-url-shorteners">See how pinch.to compares with other shorteners.</a></p>
+
+    <h2>Privacy</h2>
     <ul>
-        <li><strong>Unbeatable Shortness:</strong> We pride ourselves on producing URLs so short, you'll wonder if
-            they're
-            in hiding. Our innovative use of Unicode characters crafts links that are sleek, snappy, and fit for any
-            occasion.
-        </li>
-        <li><strong>Emoji-tize Your Links:</strong> Spice up your URLs with a touch of emoji magic. Express yourself,
-            grab
-            attention, and let your links sparkle with personality.</li>
-        <li><strong>Effortless and Instant:</strong> Using Pinch.to is smoother than sliding down a buttered rainbow.
-            Just
-            paste your URL, click the button, and voilà! Your compact link is ready for action.</li>
+        <li>Every link shows up in the public list of recent links on the home page, with its click count. Do not
+            shorten anything private.</li>
+        <li>No trackers, analytics or ads. The pages load nothing from other sites: QR codes are drawn by pinch.to, and
+            the small site icons in the list are fetched once per domain and served from here.</li>
+        <li>pinch.to stores how often each link was opened, not who opened it.</li>
     </ul>
 
-    <h2>Why Go Long When You Can Go Short?</h2>
-    <p>Long URLs can be the ultimate party poopers, hogging up precious space and leaving users with a case of "URL
-        fatigue." But fret not, because Pinch.to has got your back! We're here to revolutionize your link-sharing
-        experience,
-        one 🤏 at a time.</p>
-
-    <h2>Security? You've Got It!</h2>
-    <p>Worried about privacy and security? So are we! Your data is guarded like a treasure trove. We employ
-        state-of-the-art
-        security measures to ensure your trust and confidence.</p>
-
-    <h2>Join the Pinch.to Movement</h2>
-    <p>Join the league of savvy users who've discovered the power of compact URLs. Experience the joy of simplicity, the
-        magic of emojis, and the triumph of saying more with less.</p>
-
-    <h2>Try Pinch.to Today</h2>
-    <p>Ready to unleash the magic of concise URLs? Head on over to Pinch.to and give it a whirl. Shorten, emoji-tize,
-        and
-        share your links like a pro!</p>
-
-    <p>Got questions or feedback? Drop us a line at <a href="mailto:support@pinch.to">support@pinch.to</a>. We love
-        hearing
-        from our users!</p>
-
-    <p>Let's keep it short and snappy, together! 🚀</p>
-    <br>
-    <hr>
-    <p><em>Author: ChatGPT</em> | <em>July 22, 2023</em></p>
-
-
+    <h2>Open source</h2>
+    <p>pinch.to is written in Rust, and its source code is on GitHub at
+        <a href="https://github.com/vongaisberg/unishort">vongaisberg/unishort</a>. Questions, bug reports and ideas are
+        welcome there as issues.</p>
 </div>
-
-{{!-- <p class="bottom">
-    So far, <b>{{url_counter}}</b> short URLs have been created.
-</p> --}}
 {{/inline}}
-{{> layout title="About Pinch.to - The World's Shortest URL Shortener"
+{{> layout title="About pinch.to, the Shortest URL Shortener in the World"
 path="/blog/about"
-description="Shorten any link to two characters, like 🤏.to/ꙮ𐐀. pinch.to uses the whole Unicode range to make the shortest URLs in the world. Free, no sign-up, no trackers."}}
+description="How pinch.to makes the shortest links in the world: an emoji domain and two-letter codes drawn from 131,000 Unicode letters. Free, open source, no trackers."}}

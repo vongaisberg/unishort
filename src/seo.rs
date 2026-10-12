@@ -23,7 +23,7 @@ const SITEMAP_XML: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://pinch.to/</loc></url>
   <url><loc>https://pinch.to/blog/about</loc></url>
-  <url><loc>https://pinch.to/blog/top-10-shortest-url-shorteners-2023</loc></url>
+  <url><loc>https://pinch.to/blog/shortest-url-shorteners</loc></url>
 </urlset>
 "#;
 

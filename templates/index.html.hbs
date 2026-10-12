@@ -53,6 +53,37 @@
 {{!-- <p class="bottom">
     So far, <b>{{url_counter}}</b> short URLs have been created.
 </p> --}}
+<div class="blog home-info">
+    <h2>The shortest URL shortener in the world</h2>
+    <p>A pinch.to link has seven characters. Other shorteners need nine to twenty for a new link:</p>
+    <div class="blog-scroll">
+        <table class="compare">
+            <tr class="us"><td>pinch.to</td><td><code>🤏.to/ꙮ𐐀</code></td><td class="num">7</td></tr>
+            <tr><td>T.LY</td><td><code>t.ly/abcd</code></td><td class="num">9</td></tr>
+            <tr><td>Bitly</td><td><code>bit.ly/3xYz9Ab</code></td><td class="num">14</td></tr>
+            <tr><td>TinyURL</td><td><code>tinyurl.com/2y5nzyk7</code></td><td class="num">20</td></tr>
+        </table>
+    </div>
+    <p><a href="/blog/shortest-url-shorteners">The full comparison, with how we measured</a></p>
+
+    <h3>What is the shortest URL possible?</h3>
+    <p>A domain has at least four characters: one letter, a dot and a two-letter ending, like <code>t.co</code> or
+        <code>🤏.to</code>. After the slash, other shorteners use four to ten Latin letters and digits. pinch.to uses two
+        letters from all of Unicode's scripts, which is enough for 17 billion links.</p>
+
+    <h3>Do the links work everywhere?</h3>
+    <p>Browsers open them. Some apps do not turn an emoji domain into a clickable link; there, send
+        <code>pinch.to/ꙮ𐐀</code> instead. Every code works on both domains.</p>
+
+    <h3>Are they shorter in bytes, too?</h3>
+    <p>No. Browsers send <code>🤏.to/ꙮ𐐀</code> as <code>xn--rp9h.to/%EA%99%AE%F0%90%90%80</code>, and the
+        characters are hard to type. pinch.to links are short to look at, on a screen or on paper.</p>
+
+    <h3>Is it free?</h3>
+    <p>Yes, with no account, no ads and no trackers. The <a href="https://github.com/vongaisberg/unishort">source code
+            is on GitHub</a>. Every link appears in the public list above, so do not shorten anything private.
+        <a href="/blog/about">More about how pinch.to works</a>.</p>
+</div>
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "WebApplication", "name": "pinch.to",
  "url": "https://pinch.to/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",

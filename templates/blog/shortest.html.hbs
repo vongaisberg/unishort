@@ -1,0 +1,96 @@
+{{#*inline "page"}}
+<div class="blog">
+    <h1 class="blog_header"><span class="gradient-text">The shortest URL shorteners in 2026, measured</span></h1>
+
+    <p>Many link shorteners call themselves the shortest. We shortened the same address with each of them and counted
+        the characters of the link you get back, as it appears on screen, without <code>https://</code>.</p>
+
+    <div class="blog-scroll">
+        <table class="compare">
+            <tr>
+                <th>Service</th>
+                <th>Link</th>
+                <th class="num">Code</th>
+                <th class="num">Total</th>
+            </tr>
+            <tr class="us">
+                <td>pinch.to</td>
+                <td><code>🤏.to/ꙮ𐐀</code></td>
+                <td class="num">2</td>
+                <td class="num">7</td>
+            </tr>
+            <tr>
+                <td>T.LY</td>
+                <td><code>t.ly/abcd</code>*</td>
+                <td class="num">4</td>
+                <td class="num">9</td>
+            </tr>
+            <tr>
+                <td>da.gd</td>
+                <td><code>da.gd/Vr0D1</code></td>
+                <td class="num">5</td>
+                <td class="num">11</td>
+            </tr>
+            <tr>
+                <td>v.gd</td>
+                <td><code>v.gd/lcmljb</code></td>
+                <td class="num">6</td>
+                <td class="num">11</td>
+            </tr>
+            <tr>
+                <td>is.gd</td>
+                <td><code>is.gd/AG3Hwv</code></td>
+                <td class="num">6</td>
+                <td class="num">12</td>
+            </tr>
+            <tr>
+                <td>Bitly</td>
+                <td><code>bit.ly/3xYz9Ab</code>*</td>
+                <td class="num">7</td>
+                <td class="num">14</td>
+            </tr>
+            <tr>
+                <td>clck.ru</td>
+                <td><code>clck.ru/3WT4dG</code></td>
+                <td class="num">6</td>
+                <td class="num">14</td>
+            </tr>
+            <tr>
+                <td>X (t.co)</td>
+                <td><code>t.co/AbCdEfGhIj</code>*</td>
+                <td class="num">10</td>
+                <td class="num">15</td>
+            </tr>
+            <tr>
+                <td>TinyURL</td>
+                <td><code>tinyurl.com/2y5nzyk7</code></td>
+                <td class="num">8</td>
+                <td class="num">20</td>
+            </tr>
+        </table>
+    </div>
+    <p class="note">Checked on 12 October 2026 by shortening a new address on each service. * Not made by us: the
+        format the service itself shows. X shortens every link posted there, and only there.</p>
+
+    <h2>Why the domains are not the difference</h2>
+    <p>The shortest domain anyone can register has four characters: one letter, a dot, and a two-letter country
+        ending, like <code>t.co</code>, <code>t.ly</code> or <code>🤏.to</code>. Every serious contender has one, so the
+        race is decided by the code after the slash.</p>
+
+    <h2>Why the codes are</h2>
+    <p>Other shorteners build codes from the 62 letters and digits of the Latin alphabet. To tell billions of links
+        apart with 62 symbols, a code needs five to seven of them. pinch.to draws from about 131,000 letters across all
+        of Unicode's scripts, so two characters are enough for 17 billion different links.</p>
+
+    <h2>The catch</h2>
+    <p>Short to look at is not short in every sense. Browsers send <code>🤏.to/ꙮ𐐀</code> as
+        <code>xn--rp9h.to/%EA%99%AE%F0%90%90%80</code>, and nobody can type <code>ꙮ</code> from memory. pinch.to links
+        are made for reading, pasting and printing. If you need a link people can type, Bitly or T.LY with a
+        custom name is the better choice.</p>
+
+    <p><a href="/">Make a pinch.to link</a> · <a href="/blog/about">How pinch.to works</a></p>
+</div>
+{{/inline}}
+{{> layout title="The Shortest URL Shorteners in 2026, Measured - pinch.to"
+path="/blog/shortest-url-shorteners"
+description="We shortened the same link with pinch.to, T.LY, Bitly, TinyURL, is.gd and others and counted the characters. The shortest: 🤏.to/ꙮ𐐀, 7 characters."}}
