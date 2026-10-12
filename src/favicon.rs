@@ -10,7 +10,7 @@
 //! let anyone make this server request addresses inside the cluster.
 
 use chrono::{Duration, NaiveDateTime, Utc};
-use diesel::pg::upsert::excluded;
+use diesel::upsert::excluded;
 use diesel::prelude::*;
 use rocket::http::{ContentType, Header, Status};
 use rocket::State;
@@ -93,7 +93,7 @@ fn is_valid_host(domain: &str) -> bool {
 
 /// Whether some stored link points at `domain`. Only those get fetched, so
 /// this cannot be used as an open proxy to Google, or to fill the table.
-fn is_linked(conn: &PgConnection, domain: &str) -> QueryResult<bool> {
+fn is_linked(conn: &mut PgConnection, domain: &str) -> QueryResult<bool> {
     // Rows from before URLs were normalized can hold the Unicode form.
     let (unicode, _) = idna::domain_to_unicode(domain);
     let mut patterns = Vec::new();
@@ -158,8 +158,8 @@ pub async fn favicon(
     let owned = domain.to_owned();
     let (stored, linked) = db::run(pool, move |conn| {
         let stored = favicons::table
-            .select((favicons::icon, favicons::content_type, favicons::fetched_at))
             .find(&owned)
+            .select((favicons::icon, favicons::content_type, favicons::fetched_at))
             .first::<Favicon>(conn)
             .optional()?;
         // Only needed when there is nothing fresh to serve.

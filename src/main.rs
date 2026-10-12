@@ -4,8 +4,6 @@ extern crate rocket;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
-extern crate diesel_migrations;
-#[macro_use]
 extern crate lazy_static;
 
 pub mod blog;
@@ -20,6 +18,7 @@ pub mod url_codepoint;
 use diesel::insert_into;
 use diesel::prelude::*;
 use diesel::result::{DatabaseErrorKind, Error as DieselError};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use rocket::fairing::AdHoc;
 use rocket::form::Form;
 use rocket::fs::FileServer;
@@ -48,7 +47,7 @@ const CONTENT_SECURITY_POLICY: &str = "default-src 'none'; script-src 'self'; \
     style-src 'self'; img-src 'self'; form-action 'self'; base-uri 'none'; \
     frame-ancestors 'none'";
 
-embed_migrations!();
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 /// The public base URL short links are displayed with, from the `URL` env var.
 pub struct ServerUrl(pub String);
@@ -184,8 +183,10 @@ async fn run_migrations(rocket: rocket::Rocket<rocket::Build>) -> rocket::Rocket
         None => return rocket,
     };
     let result = rocket::tokio::task::spawn_blocking(move || {
-        let conn = pool.get().map_err(|e| e.to_string())?;
-        embedded_migrations::run(&*conn).map_err(|e| e.to_string())
+        let mut conn = pool.get().map_err(|e| e.to_string())?;
+        conn.run_pending_migrations(MIGRATIONS)
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     })
     .await;
     match result {

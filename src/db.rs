@@ -29,12 +29,12 @@ pub fn initialize(max_size: u32) -> PgPool {
 /// untouched, so callers can still tell query errors apart.
 pub async fn run<T, F>(pool: &PgPool, f: F) -> Result<T, Status>
 where
-    F: FnOnce(&PgConnection) -> T + Send + 'static,
+    F: FnOnce(&mut PgConnection) -> T + Send + 'static,
     T: Send + 'static,
 {
     let pool = pool.clone();
     task::spawn_blocking(move || match pool.get() {
-        Ok(conn) => Ok(f(&conn)),
+        Ok(mut conn) => Ok(f(&mut conn)),
         Err(e) => {
             log::error!("Could not get a database connection: {}", e);
             Err(Status::ServiceUnavailable)
