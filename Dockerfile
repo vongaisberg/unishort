@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/build/target \
     --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     set -eux; \
+    cargo test --release --locked; \
     cargo build --release --locked; \
     objcopy --compress-debug-sections target/release/$pkg ./main
 
