@@ -12,6 +12,7 @@ pub mod favicon;
 pub mod models;
 pub mod qr;
 pub mod schema;
+pub mod seo;
 pub mod target_url;
 pub mod url_codepoint;
 
@@ -213,19 +214,28 @@ fn rocket() -> _ {
         .manage(favicon::Client::new())
         .attach(AdHoc::on_ignite("Database migrations", run_migrations))
         .attach(Template::fairing())
-        .attach(AdHoc::on_response("Content-Security-Policy", |_, response| {
+        .attach(AdHoc::on_response("Page headers", |request, response| {
             Box::pin(async move {
                 if response.content_type() == Some(ContentType::HTML) {
                     response.set_header(Header::new(
                         "Content-Security-Policy",
                         CONTENT_SECURITY_POLICY,
                     ));
+                    seo::on_page(request, response);
                 }
             })
         }))
         .mount(
             "/",
-            routes![resolve, index, shorten, qr::qr, favicon::favicon],
+            routes![
+                resolve,
+                index,
+                shorten,
+                qr::qr,
+                favicon::favicon,
+                seo::robots,
+                seo::sitemap
+            ],
         )
         .mount("/static", FileServer::from("static"))
         .mount("/blog", blog::get_routes())

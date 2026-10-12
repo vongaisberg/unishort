@@ -53,6 +53,13 @@
 {{!-- <p class="bottom">
     So far, <b>{{url_counter}}</b> short URLs have been created.
 </p> --}}
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "WebApplication", "name": "pinch.to",
+ "url": "https://pinch.to/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+ "description": "The shortest URL shortener in the world: links of two Unicode characters, like 🤏.to/ꙮ𐐀.",
+ "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}}
+</script>
 {{/inline}}
 {{> layout title="pinch.to - Shortest URL Shortener in the World"
-description="🤏.to produces the shortest URLs in the world by using the full unicode spectrum."}}
+path="/"
+description="Shorten any link to two characters, like 🤏.to/ꙮ𐐀. pinch.to uses the whole Unicode range to make the shortest URLs in the world. Free, no sign-up, no trackers."}}
