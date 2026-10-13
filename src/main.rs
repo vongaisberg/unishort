@@ -67,6 +67,29 @@ struct LinkView {
     display_url: String,
     /// The target's host, for /favicon/<host>.
     favicon_host: Option<String>,
+    /// "1 click", "5 clicks".
+    clicks_label: String,
+}
+
+impl From<Url> for LinkView {
+    fn from(link: Url) -> Self {
+        LinkView {
+            display_url: target_url::display(&link.url),
+            favicon_host: target_url::host(&link.url),
+            clicks_label: match link.clicks {
+                1 => "1 click".to_owned(),
+                n => format!("{} clicks", n),
+            },
+            link,
+        }
+    }
+}
+
+/// `server_url` without its scheme, the way short links are shown.
+fn without_scheme(server_url: &str) -> &str {
+    server_url
+        .split_once("://")
+        .map_or(server_url, |(_, rest)| rest)
 }
 
 #[get("/")]
@@ -75,32 +98,42 @@ async fn index(
     server_url: &State<ServerUrl>,
     flash: Option<FlashMessage<'_>>,
 ) -> Result<Template, Status> {
-    let links = db::run(pool, |conn| {
-        urls.order_by(timestamp.desc()).limit(10).load::<Url>(conn)
+    // Set by `shorten`: either the id of the link that was just created, to
+    // show it on its own, or why the submitted URL was refused. Only once.
+    let created_id = flash
+        .as_ref()
+        .filter(|f| f.kind() == "new")
+        .and_then(|f| f.message().parse::<i32>().ok());
+    let error = flash
+        .as_ref()
+        .filter(|f| f.kind() == "error")
+        .map(|f| f.message().to_owned());
+    let (links, created) = db::run(pool, move |conn| {
+        let links = urls
+            .order_by(timestamp.desc())
+            .limit(10)
+            .load::<Url>(conn)?;
+        let created = match created_id {
+            Some(created_id) => urls.find(created_id).first::<Url>(conn).optional()?,
+            None => None,
+        };
+        Ok::<_, DieselError>((links, created))
     })
     .await?
     .map_err(|e| {
         log::error!("Could not load recent links: {}", e);
         Status::InternalServerError
     })?;
-    let links: Vec<LinkView> = links
-        .into_iter()
-        .map(|link| LinkView {
-            display_url: target_url::display(&link.url),
-            favicon_host: target_url::host(&link.url),
-            link,
-        })
-        .collect();
-    // Set by `shorten`: either highlight the link that was just created, or
-    // say why the submitted URL was refused. Either way only once.
-    let new = flash.as_ref().map_or(false, |f| f.kind() == "new");
-    let error = flash
-        .as_ref()
-        .filter(|f| f.kind() == "error")
-        .map(|f| f.message().to_owned());
+    let links: Vec<LinkView> = links.into_iter().map(LinkView::from).collect();
     Ok(Template::render(
         "index",
-        context! {links: links, server_url: &server_url.0, new: (if new {"new"} else {""}), error: error},
+        context! {
+            links: links,
+            created: created.map(LinkView::from),
+            server_url: &server_url.0,
+            short_host: without_scheme(&server_url.0),
+            error: error,
+        },
     ))
 }
 
@@ -135,11 +168,22 @@ async fn shorten(
             short_url.eq(url_short),
             timestamp.eq(chrono::offset::Utc::now().naive_utc()),
         );
-        let inserted = db::run(pool, move |conn| insert_into(urls).values(row).execute(conn))
-            .await
-            .map_err(|_| internal_error.clone())?;
+        let inserted = db::run(pool, move |conn| {
+            insert_into(urls)
+                .values(row)
+                .returning(id)
+                .get_result::<i32>(conn)
+        })
+        .await
+        .map_err(|_| internal_error.clone())?;
         match inserted {
-            Ok(_) => return Ok(Flash::new(Redirect::to(uri!(index)), "new", "")),
+            Ok(new_id) => {
+                return Ok(Flash::new(
+                    Redirect::to(uri!(index)),
+                    "new",
+                    new_id.to_string(),
+                ))
+            }
             Err(DieselError::DatabaseError(DatabaseErrorKind::UniqueViolation, _)) => continue,
             Err(e) => {
                 log::error!("Could not insert short link: {}", e);
@@ -239,4 +283,16 @@ fn rocket() -> _ {
         )
         .mount("/static", FileServer::from("static"))
         .mount("/blog", blog::get_routes())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn short_links_are_shown_without_scheme() {
+        assert_eq!(without_scheme("http://🤏.to"), "🤏.to");
+        assert_eq!(without_scheme("https://pinch.to"), "pinch.to");
+        assert_eq!(without_scheme("pinch.to"), "pinch.to");
+    }
 }

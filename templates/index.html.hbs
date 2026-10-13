@@ -1,89 +1,115 @@
+{{#*inline "copy"}}
+<button type="button" class="copy" data-copy="{{@root.server_url}}/{{short_url}}" aria-label="Copy {{@root.short_host}}/{{short_url}}">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+    <span>Copy</span>
+</button>
+{{/inline}}
 {{#*inline "page"}}
-<div class="hero">
-    <h1 class="hero-title"><span class="gradient-text">Make your URLs this <span
-                class="non-transparent">🤏</span> short</span></h1><br>
-    <span class="subtitle">pinch.to produces the shortest links in the world by using the full spectrum of unicode characters.</span>
-    <div id="box">
-        <form action="/" method="post">
-            <!-- <label for="url_long">Enter your long URL here:</label> -->
-            <input placeholder="Paste your long URL here" pattern="\s*\S+[.:]\S+\s*" title="A web address, like example.com/page" required autofocus id="url_long"
-                name="url_long">
-            <button id="submit" type="submit">Shorten Now!</button>
-        </form>
-        {{#if error}}<p class="error">{{error}}</p>{{/if}}
+<section class="hero">
+    <p class="eyebrow">The shortest URL shortener in the world</p>
+    <h1>Make your links this <span class="pinch">🤏</span> short</h1>
+    <p class="lede">Any web address becomes seven characters: a one-emoji domain and two letters drawn from all of
+        Unicode.</p>
+
+    <form class="shorten" action="/" method="post">
+        <label class="visually-hidden" for="url_long">Long URL</label>
+        <input id="url_long" name="url_long" type="text" inputmode="url" autocomplete="off" spellcheck="false"
+            placeholder="Paste a long link" pattern="\s*\S+[.:]\S+\s*"
+            title="A web address, like example.com/page" required autofocus>
+        <button type="submit">Shorten</button>
+    </form>
+    {{#if error}}<p class="error" role="alert">{{error}}</p>{{/if}}
+
+    {{#if created}}
+    {{#with created}}
+    <div class="result" role="status">
+        <div class="result-body">
+            <p class="result-label">Your short link</p>
+            <p class="result-link">
+                <a href="{{@root.server_url}}/{{short_url}}">{{@root.short_host}}/{{short_url}}</a>
+                {{> copy}}
+            </p>
+            <p class="result-target">
+                {{#if favicon_host}}<img class="favicon" src="/favicon/{{favicon_host}}" alt="">{{/if}}
+                <span>{{display_url}}</span>
+            </p>
+        </div>
+        <img class="result-qr" src="/qr/{{short_url}}" alt="QR code for {{@root.short_host}}/{{short_url}}">
     </div>
-
-
-</div>
-
-<div class="results-scroll">
-    <div class="results">
-        <b class="results-head">Recently shortened URLs</b>
-                <table class="results-table {{new}}">
-                    <tr class="header">
-                        <th class="short_url">Short Link</th>
-                        <th class="long_url">Original Link</th>
-                        <th class="qr">QR</th>
-                        <th class="clicks">Clicks</th>
-                        <th class="date">Date</th>
-                    </tr>
-                    {{#each links}}
-                    <tr class="body">
-                        <td class="short_url"><input class="short_url" type="text" aria-label="Shortened URL"
-                                value="{{../server_url}}/{{short_url}}" readonly>
-                            <img class="copy" src="/static/copy.svg"
-                                alt="{{../server_url}}/{{short_url}}">
-                        </td>
-                        <td class="long_url">
-                            <span class="no_linebreak">
-                                {{#if favicon_host}}<img class="favicon" src="/favicon/{{favicon_host}}" alt="" />{{/if}}
-                                <a href="{{../server_url}}/{{short_url}}" rel="ugc nofollow">{{display_url}}</a>
-                            </span>
-                        </td>
-                        <td class="qr"><img class="qr" src="/qr/{{short_url}}" alt="">
-                        </td>
-                        <td class="clicks">{{clicks}}</td>
-                        <td class="date"><span class="timestamp">{{timestamp}}</span></td>
-                    </tr>
-                    {{/each}}
-
-                </table>
+    {{/with}}
+    {{else}}
+    <div class="demo" aria-hidden="true">
+        <span class="demo-long">https://www.example.com/blog/2026/10/a-very-long-article-title?utm_source=newsletter</span>
+        <span class="demo-arrow">↓</span>
+        <span class="demo-short">🤏.to/ꙮ𐐀</span>
     </div>
-</div>
-{{!-- <p class="bottom">
-    So far, <b>{{url_counter}}</b> short URLs have been created.
-</p> --}}
-<div class="blog home-info">
+    {{/if}}
+</section>
+
+<section class="recent">
+    <h2>Recently shortened</h2>
+    <p class="section-note">Every link is public. Do not shorten anything private.</p>
+    <ul class="links">
+        {{#each links}}
+        <li class="link">
+            <img class="link-qr" src="/qr/{{short_url}}" alt="" loading="lazy">
+            <div class="link-main">
+                <p class="link-short">
+                    <a href="{{@root.server_url}}/{{short_url}}" rel="ugc nofollow">{{@root.short_host}}/{{short_url}}</a>
+                    {{> copy}}
+                </p>
+                <p class="link-target">
+                    {{#if favicon_host}}<img class="favicon" src="/favicon/{{favicon_host}}" alt="" loading="lazy">{{/if}}
+                    <span>{{display_url}}</span>
+                </p>
+            </div>
+            <p class="link-meta">
+                <span>{{clicks_label}}</span>
+                <time class="timestamp" datetime="{{timestamp}}">{{timestamp}}</time>
+            </p>
+        </li>
+        {{/each}}
+    </ul>
+</section>
+
+<section class="explain prose">
     <h2>The shortest URL shortener in the world</h2>
     <p>A pinch.to link has seven characters. Other shorteners need nine to twenty for a new link:</p>
-    <div class="blog-scroll">
-        <table class="compare">
-            <tr class="us"><td>pinch.to</td><td><code>🤏.to/ꙮ𐐀</code></td><td class="num">7</td></tr>
-            <tr><td>T.LY</td><td><code>t.ly/abcd</code></td><td class="num">9</td></tr>
-            <tr><td>Bitly</td><td><code>bit.ly/3xYz9Ab</code></td><td class="num">14</td></tr>
-            <tr><td>TinyURL</td><td><code>tinyurl.com/2y5nzyk7</code></td><td class="num">20</td></tr>
-        </table>
+    <ol class="bars">
+        <li class="us"><span class="bar-name">pinch.to</span><code>🤏.to/ꙮ𐐀</code><span class="bar-track"><span class="bar w7"></span></span><span class="bar-n">7</span></li>
+        <li><span class="bar-name">T.LY</span><code>t.ly/abcd</code><span class="bar-track"><span class="bar w9"></span></span><span class="bar-n">9</span></li>
+        <li><span class="bar-name">Bitly</span><code>bit.ly/3xYz9Ab</code><span class="bar-track"><span class="bar w14"></span></span><span class="bar-n">14</span></li>
+        <li><span class="bar-name">TinyURL</span><code>tinyurl.com/2y5nzyk7</code><span class="bar-track"><span class="bar w20"></span></span><span class="bar-n">20</span></li>
+    </ol>
+    <p><a href="/blog/shortest-url-shorteners">The full comparison, with how we measured →</a></p>
+
+    <div class="faq">
+        <div>
+            <h3>What is the shortest URL possible?</h3>
+            <p>A domain has at least four characters: one letter, a dot and a two-letter ending, like <code>t.co</code>
+                or <code>🤏.to</code>. After the slash, other shorteners use four to ten Latin letters and digits.
+                pinch.to uses two letters from all of Unicode's scripts, which is enough for 17 billion links.</p>
+        </div>
+        <div>
+            <h3>Do the links work everywhere?</h3>
+            <p>Browsers open them. Some apps do not turn an emoji domain into a clickable link; there, send
+                <code>pinch.to/ꙮ𐐀</code> instead. Every code works on both domains.</p>
+        </div>
+        <div>
+            <h3>Are they shorter in bytes, too?</h3>
+            <p>No. Browsers send <code>🤏.to/ꙮ𐐀</code> as <code>xn--rp9h.to/%EA%99%AE%F0%90%90%80</code>, and the
+                characters are hard to type. pinch.to links are short to look at, on a screen or on paper.</p>
+        </div>
+        <div>
+            <h3>Is it free?</h3>
+            <p>Yes, with no account, no ads and no trackers. The <a
+                    href="https://github.com/vongaisberg/unishort">source code is on GitHub</a>. Every link appears in
+                the public list above, so do not shorten anything private. <a href="/blog/about">More about how pinch.to
+                    works</a>.</p>
+        </div>
     </div>
-    <p><a href="/blog/shortest-url-shorteners">The full comparison, with how we measured</a></p>
+</section>
 
-    <h3>What is the shortest URL possible?</h3>
-    <p>A domain has at least four characters: one letter, a dot and a two-letter ending, like <code>t.co</code> or
-        <code>🤏.to</code>. After the slash, other shorteners use four to ten Latin letters and digits. pinch.to uses two
-        letters from all of Unicode's scripts, which is enough for 17 billion links.</p>
-
-    <h3>Do the links work everywhere?</h3>
-    <p>Browsers open them. Some apps do not turn an emoji domain into a clickable link; there, send
-        <code>pinch.to/ꙮ𐐀</code> instead. Every code works on both domains.</p>
-
-    <h3>Are they shorter in bytes, too?</h3>
-    <p>No. Browsers send <code>🤏.to/ꙮ𐐀</code> as <code>xn--rp9h.to/%EA%99%AE%F0%90%90%80</code>, and the
-        characters are hard to type. pinch.to links are short to look at, on a screen or on paper.</p>
-
-    <h3>Is it free?</h3>
-    <p>Yes, with no account, no ads and no trackers. The <a href="https://github.com/vongaisberg/unishort">source code
-            is on GitHub</a>. Every link appears in the public list above, so do not shorten anything private.
-        <a href="/blog/about">More about how pinch.to works</a>.</p>
-</div>
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "WebApplication", "name": "pinch.to",
  "url": "https://pinch.to/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
