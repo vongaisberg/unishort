@@ -6,6 +6,7 @@ extern crate diesel;
 #[macro_use]
 extern crate lazy_static;
 
+pub mod assets;
 pub mod blog;
 pub mod db;
 pub mod favicon;
@@ -257,7 +258,11 @@ fn rocket() -> _ {
         .manage(ServerUrl(server_url))
         .manage(favicon::Client::new())
         .attach(AdHoc::on_ignite("Database migrations", run_migrations))
-        .attach(Template::fairing())
+        .attach(Template::custom(|engines| {
+            engines
+                .handlebars
+                .register_helper("asset", Box::new(assets::asset));
+        }))
         .attach(AdHoc::on_response("Page headers", |request, response| {
             Box::pin(async move {
                 if response.content_type() == Some(ContentType::HTML) {
